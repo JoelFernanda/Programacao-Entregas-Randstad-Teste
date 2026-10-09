@@ -855,7 +855,7 @@ function receberEstadoFirebase(s){
   if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;if(preservarTela){firebaseSnapshotRenderPendente=true;}else{firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);}checarNovasEntregas();}
 }
 window.receiveProgramFirebaseSnapshot=receberEstadoFirebase;
-window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);var codigo=e&&e.code?String(e.code):'sem código';toast('Falha ao sincronizar ('+codigo+'). Confira a conexão e tente novamente.','error');};
+window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);var codigo=e&&e.code?String(e.code):'sem código';var colecao=e&&e.syncCollection?' na coleção '+String(e.syncCollection):'';toast('Falha ao sincronizar ('+codigo+colecao+'). Confira a conexão e tente novamente.','error');};
 
 /* ============ SOM DE NOTIFICAÇÃO ============ */
 function playNotifSound(){
@@ -2120,6 +2120,22 @@ function scheduleSync(state) {
   }, 250);
 }
 async function commitOperations(ops, epoch) {
+  if (activeProfile && activeProfile.role === 'Motorista') {
+    for (const op of ops) {
+      if (epoch !== syncEpoch) throw new Error('A sincronização foi interrompida.');
+      const batch = writeBatch(db);
+      if (op.type === 'delete') batch.delete(op.ref);
+      else batch.set(op.ref, op.data);
+      try { await batch.commit(); }
+      catch (e) {
+        const err = new Error(e && e.message ? e.message : 'Falha na gravação do motorista.');
+        err.code = e && e.code ? e.code : 'unknown';
+        err.syncCollection = op.ref && op.ref.parent ? op.ref.parent.id : 'unknown';
+        throw err;
+      }
+    }
+    return;
+  }
   for (let i = 0; i < ops.length; i += 15) {
     if (epoch !== syncEpoch) throw new Error('A sincronização foi interrompida.');
     const batch = writeBatch(db);
