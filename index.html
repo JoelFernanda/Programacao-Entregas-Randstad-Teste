@@ -784,6 +784,16 @@ function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){retu
 function iniciais(n){return (n||'').split(/\s+/).slice(0,2).map(function(x){return x[0]||'';}).join('').toUpperCase();}
 function fmtDataBR(iso){if(!iso)return '';var p=iso.split('-');if(p.length!==3)return iso;return p[2]+'/'+p[1]+'/'+p[0];}
 function gerarNumeroProg(){return 'PROG-'+String(programacoes.length+1).padStart(4,'0');}
+function instanteCriacaoProgramacao(p){
+  var iso=Date.parse(p&&p.criadoEmISO||'');if(isFinite(iso))return iso;
+  var s=String(p&&p.criadoEm||''),m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,?\s*(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if(!m)return 0;
+  return new Date(Number(m[3]),Number(m[2])-1,Number(m[1]),Number(m[4]||0),Number(m[5]||0),Number(m[6]||0)).getTime();
+}
+function compararProgramacoesPorInclusao(a,b){
+  var ta=instanteCriacaoProgramacao(a),tb=instanteCriacaoProgramacao(b);
+  return ta===tb?0:tb-ta;
+}
 function encontrarProgPorNumero(n){for(var i=0;i<programacoes.length;i++){if(programacoes[i].numero===n)return programacoes[i];}return null;}
 function encontrarClientePorCad(c){for(var i=0;i<clientes.length;i++){if(clientes[i].cad===c)return clientes[i];}return null;}
 function nomeClienteDoCad(c){if(!c)return '';var atual=String(c.cliente||'').trim();if(atual)return atual;var legado=String(c.nome||'').trim();return legado&&normalizarCad(legado)!==normalizarCad(c.cad)?legado:'';}
@@ -1029,7 +1039,7 @@ function renderProgramacao(){
   for(var tt=0;tt<TIPOS.length;tt++){optsTipo+='<option value="'+esc(TIPOS[tt])+'">'+esc(TIPOS[tt])+'</option>';}
   var optsCliente='<option value="">-- Selecione --</option>';
   for(var cc=0;cc<clientes.length;cc++){var cliOpt=clientes[cc],nomeCliOpt=nomeClienteDoCad(cliOpt);optsCliente+='<option value="'+esc(cliOpt.cad)+'">'+esc(cliOpt.cad)+(nomeCliOpt?' - '+esc(nomeCliOpt):'')+'</option>';}
-  var ordenadas=programacoes.slice().sort(function(a,b){var da=a.dataEntrega||'',db=b.dataEntrega||'';if(da!==db)return db.localeCompare(da);return (b.horaEntrega||'').localeCompare(a.horaEntrega||'');});
+  var ordenadas=programacoes.slice().sort(function(a,b){var recente=compararProgramacoesPorInclusao(a,b);if(recente)return recente;var da=a.dataEntrega||'',db=b.dataEntrega||'';if(da!==db)return db.localeCompare(da);return (b.horaEntrega||'').localeCompare(a.horaEntrega||'');});
   var cards='';
   for(var j=0;j<ordenadas.length;j++){
     var p=ordenadas[j],cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
@@ -1364,10 +1374,11 @@ function renderPainelGrid(){
   var grid=document.getElementById('painelGrid');if(!grid)return;
   if(programacoes.length===0){grid.innerHTML='<div class="empty" style="grid-column:1/-1">Nenhuma programação cadastrada.</div>';return;}
   var ordenadas=programacoes.slice().sort(function(a,b){
-    var ordem={EmRota:0,Programado:1,Entregue:2};
+    var ordem={'Em Rota':0,Programado:1,Entregue:2};
     var oa=ordem[a.status]!==undefined?ordem[a.status]:3;
     var ob=ordem[b.status]!==undefined?ordem[b.status]:3;
     if(oa!==ob)return oa-ob;
+    var recente=compararProgramacoesPorInclusao(a,b);if(recente)return recente;
     return (a.dataEntrega||'').localeCompare(b.dataEntrega||'');
   });
   var cards='';
@@ -1487,7 +1498,7 @@ function renderMotorista(){
     pillsHtml+='<button class="mot-day-pill'+(ativo?' active':'')+(disabled?' no-delivery':'')+'"'+(disabled?' disabled':'')+' onclick="motSelecionarDia(\''+ds+'\')"><span class="mdp-label mdp-long">'+diasLongos[wd2]+'</span><span class="mdp-label mdp-short">'+diasCurtos[wd2]+'</span><span class="mdp-date">'+fmtDataBR(ds)+'</span><span class="mdp-count">'+listaDia.length+' entrega'+(listaDia.length===1?'':'s')+'</span>'+(pend>0?'<span class="mdp-badge">'+pend+' pend.</span>':'')+'</button>';
   }
   pillsHtml+='</div>';
-  var lista=(porDia[_motDiaSel]||[]).slice();lista.sort(function(a,b){var ordem={EmRota:0,Programado:1,Entregue:2},oa=ordem[a.status]!==undefined?ordem[a.status]:3,ob=ordem[b.status]!==undefined?ordem[b.status]:3;if(oa!==ob)return oa-ob;return (a.horaEntrega||'').localeCompare(b.horaEntrega||'');});
+  var lista=(porDia[_motDiaSel]||[]).slice();lista.sort(function(a,b){var ordem={'Em Rota':0,Programado:1,Entregue:2},oa=ordem[a.status]!==undefined?ordem[a.status]:3,ob=ordem[b.status]!==undefined?ordem[b.status]:3;if(oa!==ob)return oa-ob;return (a.horaEntrega||'').localeCompare(b.horaEntrega||'');});
   var cardsHtml='';for(var j=0;j<lista.length;j++)cardsHtml+=renderMotCard(lista[j]);
   var labelDiaSel=motDiaNomeCompleto(_motDiaSel)+' · '+fmtDataBR(_motDiaSel);
   conteudo.innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' '+esc(titulo)+'</h1><p>Entregas · '+esc(labelDiaSel)+' · '+lista.length+' entrega'+(lista.length===1?'':'s')+'</p></div>'+toolbar+pillsHtml+'<div class="mot-dia-cards">'+(cardsHtml||'<div class="empty">Nenhuma entrega neste dia.</div>')+'</div>';
