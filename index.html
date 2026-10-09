@@ -855,7 +855,7 @@ function receberEstadoFirebase(s){
   if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;if(preservarTela){firebaseSnapshotRenderPendente=true;}else{firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);}checarNovasEntregas();}
 }
 window.receiveProgramFirebaseSnapshot=receberEstadoFirebase;
-window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);toast('Não foi possível sincronizar agora. Confira a conexão e tente novamente.','error');};
+window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);var codigo=e&&e.code?String(e.code):'sem código';toast('Falha ao sincronizar ('+codigo+'). Confira a conexão e tente novamente.','error');};
 
 /* ============ SOM DE NOTIFICAÇÃO ============ */
 function playNotifSound(){
