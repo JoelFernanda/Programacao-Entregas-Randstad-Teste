@@ -614,6 +614,29 @@ body.dark-mode .mot-nav-hint{background:#392716;color:#ffd19c;border-color:#6f48
 .monitor-tooltip:before{display:none!important}
 body.dark-mode .monitor-driver-card{background:var(--surface);border-color:var(--line)}
 @media(max-width:640px){#monitorMapa{height:380px}.monitor-list-grid{grid-template-columns:1fr}.monitor-map-head{align-items:flex-start}}
+/* Paleta suave compartilhada: Painel TV e Motorista */
+.mot-week-toolbar{flex-wrap:wrap}
+.mot-driver-picker{display:flex;flex-direction:column;gap:4px;min-width:190px;font-size:11px;font-weight:750;color:var(--muted)}
+.mot-driver-picker .input{padding:8px 10px;font-size:13px}
+.mot-week-toolbar-empty{justify-content:flex-start}
+.pedido-card.programado{background:linear-gradient(135deg,#8ACBA9 0%,#85C4B4 54%,#84BCC0 100%);border-color:#B7DDC9;border-left-color:#A1F0C6}
+.pedido-card.emrota{background:linear-gradient(135deg,#E3B58B 0%,#DCA88E 54%,#D49E95 100%);border-color:#E8C2A8;border-left-color:#FFE0AD}
+.pedido-card.entregue{background:linear-gradient(135deg,#94B6E6 0%,#91AEE2 54%,#92A5D5 100%);border-color:#B8CBEA;border-left-color:#BBDAFF}
+.pedido-card .pc-numero,.pedido-card .pc-cad,.pedido-card .pc-line b{color:#172B43}
+.pedido-card .pc-status{box-shadow:none;border-color:rgba(23,43,67,.14);text-shadow:none}
+.pedido-card.programado .pc-status{background:#D8F2E1;color:#23593B}
+.pedido-card.emrota .pc-status{background:#F8E4D7;color:#865021}
+.pedido-card.entregue .pc-status{background:#DDEBFA;color:#2E4E7C}
+.mot-cad-card.programado{background:linear-gradient(135deg,#8ACBA9 0%,#85C4B4 54%,#84BCC0 100%);border-left-color:#A1F0C6}
+.mot-cad-card.emrota{background:linear-gradient(135deg,#E3B58B 0%,#DCA88E 54%,#D49E95 100%);border-left-color:#FFE0AD}
+.mot-cad-card.entregue{background:linear-gradient(135deg,#94B6E6 0%,#91AEE2 54%,#92A5D5 100%);border-left-color:#BBDAFF}
+.mot-cad-card .mcc-cad,.mot-cad-card.emrota .mcc-cad,.mot-cad-card.entregue .mcc-cad{color:#172B43}
+.mot-cad-card .mcc-schedule span,.mot-cad-card.emrota .mcc-schedule span,.mot-cad-card.entregue .mcc-schedule span{color:#40566F}
+.mot-cad-card .mcc-info svg,.mot-cad-card.emrota .mcc-info svg,.mot-cad-card.entregue .mcc-info svg{color:#40566F}
+.mot-cad-card .pill.programado{background:#D8F2E1;color:#23593B;border-color:#B7DDC9}
+.mot-cad-card .pill.emrota{background:#F8E4D7;color:#865021;border-color:#E8C2A8}
+.mot-cad-card .pill.entregue{background:#DDEBFA;color:#2E4E7C;border-color:#B8CBEA}
+@media(max-width:800px){.mot-driver-picker{min-width:0;width:100%}}
 </style>
 </head>
 <body>
@@ -770,8 +793,9 @@ var _notifInterval=null;
 var _lastNotifSig='';
 var _motDiaSel=null;
 var _motSemanaBase=null;
+var _motMotoristaFiltro='*';
 var rastreadoresMotorista={},iniciosGPSPendentes={};
-var monitorMap=null,monitorMarkers={},monitorMapFitted=false,monitorRefreshTimer=null;
+var monitorMap=null,monitorMarkers={},monitorMapFitted=false,monitorMarkerSignature='',monitorRefreshTimer=null;
 var progEditando=null;
 var progDetAberta=null;
 var editandoCliente=null;
@@ -1418,7 +1442,7 @@ function corVeiculoMonitoramento(p){var keys=[];programacoes.forEach(function(x)
 function textoTempoPosicao(iso){if(!iso)return 'sem posição';var ms=Date.now()-Date.parse(iso);if(!isFinite(ms))return 'data inválida';var min=Math.max(0,Math.floor(ms/60000));if(min<1)return 'agora';if(min<60)return 'há '+min+' min';var h=Math.floor(min/60);return 'há '+h+' h '+(min%60)+' min';}
 function renderMonitoramento(){
   if(!user||user.role!=='Gestor'){toast('Somente o gestor pode acompanhar as posições','error');return;}
-  if(monitorMap){monitorMap.remove();monitorMap=null;}monitorMarkers={};monitorMapFitted=false;
+  if(monitorMap){monitorMap.remove();monitorMap=null;}monitorMarkers={};monitorMapFitted=false;monitorMarkerSignature='';
   var conteudo=document.getElementById('conteudo');if(!conteudo)return;
   conteudo.innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' Monitoramento de Motoristas</h1><p>Última posição recebida dos veículos com entrega em rota.</p></div>'
     +'<div class="info-box info"><div><b>Monitoramento sincronizado:</b> o motorista autoriza o GPS no celular ao iniciar; a posição é compartilhada com o gestor a cada 10 minutos e apagada ao finalizar. O mapa exibe somente a última posição, não o trajeto.</div></div>'
@@ -1436,14 +1460,14 @@ function atualizarMapaMonitoramento(manual){
   if(!monitorMap){if(typeof L!=='undefined'&&document.getElementById('monitorMapa'))inicializarMapaMonitoramento();if(!monitorMap)return;}
   var listaEl=document.getElementById('monitorLista');if(!listaEl)return;
   var ativos=programacoes.filter(function(p){return p.status==='Em Rota';}).sort(function(a,b){return String(a.motorista||'').localeCompare(String(b.motorista||''));});
-  var porVeiculo={},markersValidos=[];
-  ativos.forEach(function(p){var loc=p.localizacaoAtual;if(!loc||!isFinite(Number(loc.lat))||!isFinite(Number(loc.lng)))return;var key=chaveVeiculoMonitoramento(p),prev=porVeiculo[key];if(!prev||Date.parse(loc.atualizadoEm||'')>Date.parse(prev.localizacaoAtual.atualizadoEm||''))porVeiculo[key]=p;});
-  Object.keys(porVeiculo).forEach(function(key){var p=porVeiculo[key],loc=p.localizacaoAtual,color=corVeiculoMonitoramento(p),plate=placaMonitoramento(p),driver=loc.motorista||p.motorista||'Motorista não informado',keyMarker='vehicle:'+key,popup='<b>'+esc(plate)+'</b><br>'+esc(driver)+'<br>Entrega: '+esc(p.numeroReq||p.cad||'-')+' · CAD '+esc(p.cad||'-')+'<br>Atualizado '+esc(textoTempoPosicao(loc.atualizadoEm));var icon=L.divIcon({className:'monitor-marker-wrap',html:'<div class="monitor-marker" style="background:'+color+'"><span>🚚</span></div>',iconSize:[42,42],iconAnchor:[21,40]});var point=[Number(loc.lat),Number(loc.lng)];markersValidos.push(point);
+  var porMotorista={},markersValidos=[];
+  ativos.forEach(function(p){var loc=p.localizacaoAtual;if(!loc||!isFinite(Number(loc.lat))||!isFinite(Number(loc.lng)))return;var driverKey=normalizarCabecalho(loc.motorista||p.motorista||p.numero||'motorista'),prev=porMotorista[driverKey];if(!prev||Date.parse(loc.atualizadoEm||'')>Date.parse(prev.localizacaoAtual.atualizadoEm||''))porMotorista[driverKey]=p;});
+  Object.keys(porMotorista).forEach(function(key){var p=porMotorista[key],loc=p.localizacaoAtual,color=corVeiculoMonitoramento(p),plate=placaMonitoramento(p),driver=loc.motorista||p.motorista||'Motorista não informado',keyMarker='driver:'+key,popup='<b>'+esc(plate)+'</b><br>'+esc(driver)+'<br>Entrega: '+esc(p.numeroReq||p.cad||'-')+' · CAD '+esc(p.cad||'-')+'<br>Atualizado '+esc(textoTempoPosicao(loc.atualizadoEm));var icon=L.divIcon({className:'monitor-marker-wrap',html:'<div class="monitor-marker" style="background:'+color+'"><span>🚚</span></div>',iconSize:[42,42],iconAnchor:[21,40]});var point=[Number(loc.lat),Number(loc.lng)];markersValidos.push(point);
     if(!monitorMarkers[keyMarker]){monitorMarkers[keyMarker]=L.marker(point,{icon:icon}).addTo(monitorMap);monitorMarkers[keyMarker].bindTooltip('<b>'+esc(plate)+'</b> · '+esc(driver),{permanent:true,direction:'top',offset:[0,-28],className:'monitor-tooltip'});monitorMarkers[keyMarker].bindPopup(popup);}
     else{monitorMarkers[keyMarker].setLatLng(point);monitorMarkers[keyMarker].setIcon(icon);monitorMarkers[keyMarker].setTooltipContent('<b>'+esc(plate)+'</b> · '+esc(driver));monitorMarkers[keyMarker].setPopupContent(popup);}
   });
-  Object.keys(monitorMarkers).forEach(function(k){if(!porVeiculo[k.replace(/^vehicle:/,'')]){monitorMap.removeLayer(monitorMarkers[k]);delete monitorMarkers[k];}});
-  if(markersValidos.length&&!monitorMapFitted){monitorMap.fitBounds(markersValidos,{padding:[35,35],maxZoom:14});monitorMapFitted=true;}
+  Object.keys(monitorMarkers).forEach(function(k){if(!porMotorista[k.replace(/^driver:/,'')]){monitorMap.removeLayer(monitorMarkers[k]);delete monitorMarkers[k];}});
+  var markerSignature=Object.keys(porMotorista).sort().join('|');if(markersValidos.length&&(!monitorMapFitted||markerSignature!==monitorMarkerSignature)){monitorMap.fitBounds(markersValidos,{padding:[35,35],maxZoom:14});monitorMapFitted=true;monitorMarkerSignature=markerSignature;}
   var html='';if(!ativos.length)html='<div class="empty">Nenhum motorista está com entrega em rota.</div>';
   else{html='<div class="monitor-list-grid">';ativos.forEach(function(p){var loc=p.localizacaoAtual,plate=placaMonitoramento(p),color=corVeiculoMonitoramento(p),driver=loc&&loc.motorista||p.motorista||'Motorista não informado',updated=loc&&loc.atualizadoEm?new Date(loc.atualizadoEm).toLocaleString('pt-BR'):'Aguardando a primeira posição';var stale=loc&&Date.now()-Date.parse(loc.atualizadoEm)>20*60000;var pos=loc?'Última posição: '+esc(textoTempoPosicao(loc.atualizadoEm))+' · '+esc(updated)+(loc.precisao?' · precisão ~'+Math.round(loc.precisao)+' m':''):'Aguardando sinal GPS';html+='<div class="monitor-driver-card"><span class="monitor-color-dot" style="background:'+color+'"></span><div class="monitor-driver-info"><b>'+esc(driver)+'</b><span>'+esc(plate)+' · '+esc(p.carro||'Veículo')+'</span><small class="'+(stale?'monitor-stale':'')+'">'+pos+'</small><small>Entrega: '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+'</small></div></div>';});html+='</div>';}
   listaEl.innerHTML=html;if(manual)toast('Posições atualizadas');
@@ -1475,15 +1499,23 @@ function motSomarDias(ds,n){var d=new Date(ds+'T12:00:00');d.setDate(d.getDate()
 function motDiaNomeCompleto(ds){var d=new Date(ds+'T12:00:00');return ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'][d.getDay()];}
 function motSelecionarDia(ds){_motDiaSel=ds;_motSemanaBase=motSegundaDaSemana(ds);renderMotorista();}
 function motNavegarSemana(delta){if(!_motSemanaBase)_motSemanaBase=motSegundaDaSemana(_motDiaSel||motDiaHojeStr());_motSemanaBase=motSomarDias(_motSemanaBase,delta*7);_motDiaSel=null;renderMotorista();}
-function motSelecionarMes(mes){if(!mes)return;var min=mes+'-01',datas=getMinhasEntregas().map(function(p){return p.dataEntrega;}).filter(function(d){return d&&d.slice(0,7)===mes;}).sort();_motDiaSel=datas.length?datas[0]:min;_motSemanaBase=motSegundaDaSemana(_motDiaSel);renderMotorista();}
+function motListaMotoristas(){var nomes=[];(programacoes||[]).forEach(function(p){var nome=String(p&&p.motorista||'').trim();if(nome&&nomes.indexOf(nome)<0)nomes.push(nome);});(motoristasAbastecimento||[]).forEach(function(nome){nome=String(nome||'').trim();if(nome&&nomes.indexOf(nome)<0)nomes.push(nome);});if(_motMotoristaFiltro!=='*'&&nomes.indexOf(_motMotoristaFiltro)<0)nomes.push(_motMotoristaFiltro);return nomes.sort(function(a,b){return a.localeCompare(b,'pt-BR');});}
+function motProgramacoesFiltradas(){var lista=getMinhasEntregas();if(!user||user.role==='Motorista'||_motMotoristaFiltro==='*')return lista;return lista.filter(function(p){return p.motorista===_motMotoristaFiltro;});}
+function motSelecionarMotorista(nome){_motMotoristaFiltro=nome||'*';_motDiaSel=null;_motSemanaBase=null;renderMotorista();}
+function motSelecionarMes(mes){if(!mes)return;var datas=motProgramacoesFiltradas().map(function(p){return p.dataEntrega;}).filter(function(d){return d&&d.slice(0,7)===mes;}).sort();_motDiaSel=datas.length?datas[0]:null;_motSemanaBase=_motDiaSel?motSegundaDaSemana(_motDiaSel):null;renderMotorista();}
 function renderMotorista(){
-  var minhas=getMinhasEntregas();
   var conteudo=document.getElementById('conteudo');
   var titulo=(user&&user.role==='Motorista')?user.nome:'Motorista';
-  if(minhas.length===0){conteudo.innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' '+esc(titulo)+'</h1><p>Suas entregas</p></div><div class="empty">Nenhuma entrega programada para você.</div>';return;}
+  var ehGestao=!!user&&user.role!=='Motorista';
+  var opcoesMotoristas=motListaMotoristas();
+  var filtroMotorista='';
+  if(ehGestao){var optsMot='<option value="*"'+(_motMotoristaFiltro==='*'?' selected':'')+'>Todos os motoristas</option>';opcoesMotoristas.forEach(function(nome){optsMot+='<option value="'+esc(nome)+'"'+(nome===_motMotoristaFiltro?' selected':'')+'>'+esc(nome)+'</option>';});filtroMotorista='<label class="mot-driver-picker"><span>Motorista</span><select class="input" onchange="motSelecionarMotorista(this.value)">'+optsMot+'</select></label>';}
+  var minhas=motProgramacoesFiltradas();
+  if(minhas.length===0){conteudo.innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' '+esc(titulo)+'</h1><p>'+(ehGestao?'Entregas por motorista':'Suas entregas')+'</p></div>'+(ehGestao?'<div class="mot-week-toolbar mot-week-toolbar-empty">'+filtroMotorista+'</div>':'')+'<div class="empty">'+(ehGestao?(_motMotoristaFiltro==='*'?'Nenhuma entrega programada.':'Nenhuma entrega programada para '+esc(_motMotoristaFiltro)+'.'):'Nenhuma entrega programada para você.')+'</div>';return;}
   var porDia={};for(var i=0;i<minhas.length;i++){var p=minhas[i];if(!p.dataEntrega)continue;if(!porDia[p.dataEntrega])porDia[p.dataEntrega]=[];porDia[p.dataEntrega].push(p);}
   var datas=Object.keys(porDia).sort();
-  if(!_motDiaSel){
+  if(!_motDiaSel||!porDia[_motDiaSel]){
+    _motDiaSel=null;
     if(_motSemanaBase){for(var wd=0;wd<5;wd++){var cand=motSomarDias(_motSemanaBase,wd);if(porDia[cand]){_motDiaSel=cand;break;}}if(!_motDiaSel)_motDiaSel=_motSemanaBase;}
     else{var hojeStr=motDiaHojeStr(),hoje=new Date();hoje.setHours(0,0,0,0);if(porDia[hojeStr])_motDiaSel=hojeStr;else{var futuras=datas.filter(function(d){return new Date(d+'T00:00:00')>=hoje;});_motDiaSel=futuras[0]||datas[datas.length-1];}}
   }
@@ -1492,19 +1524,19 @@ function renderMotorista(){
   var opcoesMes=[];datas.forEach(function(ds){var m=ds.slice(0,7);if(opcoesMes.indexOf(m)<0)opcoesMes.push(m);});opcoesMes.sort();var mesAtual=_motDiaSel.slice(0,7);if(opcoesMes.indexOf(mesAtual)<0)opcoesMes.push(mesAtual);opcoesMes.sort();
   var optsMes='';opcoesMes.forEach(function(m){var parts=m.split('-'),label=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][Number(parts[1])-1]+' '+parts[0];optsMes+='<option value="'+m+'"'+(m===mesAtual?' selected':'')+'>'+label+'</option>';});
   var rangeLabel=fmtDataBR(segunda)+' a '+fmtDataBR(sexta)+' · '+(d2.getMonth()===d6.getMonth()?['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][d2.getMonth()]+' '+d2.getFullYear():fmtDataBR(sexta));
-  var toolbar='<div class="mot-week-toolbar"><label class="mot-month-picker"><span>Mês</span><select class="input" onchange="motSelecionarMes(this.value)">'+optsMes+'</select></label><div class="mot-week-nav"><button class="btn ghost sm" onclick="motNavegarSemana(-1)" aria-label="Semana anterior">‹</button><b>'+esc(rangeLabel)+'</b><button class="btn ghost sm" onclick="motNavegarSemana(1)" aria-label="Próxima semana">›</button></div></div>';
+  var toolbar='<div class="mot-week-toolbar"><label class="mot-month-picker"><span>Mês</span><select class="input" onchange="motSelecionarMes(this.value)">'+optsMes+'</select></label>'+filtroMotorista+'<div class="mot-week-nav"><button class="btn ghost sm" onclick="motNavegarSemana(-1)" aria-label="Semana anterior">‹</button><b>'+esc(rangeLabel)+'</b><button class="btn ghost sm" onclick="motNavegarSemana(1)" aria-label="Próxima semana">›</button></div></div>';
   var pillsHtml='<div class="mot-day-pills">';var diasLongos=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira'],diasCurtos=['Seg','Ter','Qua','Qui','Sex'];
   for(var wd2=0;wd2<5;wd2++){var ds=motSomarDias(segunda,wd2),ativo=ds===_motDiaSel,listaDia=porDia[ds]||[],pend=listaDia.filter(function(x){return x.status!=='Entregue';}).length;var disabled=listaDia.length===0?' disabled':'';
     pillsHtml+='<button class="mot-day-pill'+(ativo?' active':'')+(disabled?' no-delivery':'')+'"'+(disabled?' disabled':'')+' onclick="motSelecionarDia(\''+ds+'\')"><span class="mdp-label mdp-long">'+diasLongos[wd2]+'</span><span class="mdp-label mdp-short">'+diasCurtos[wd2]+'</span><span class="mdp-date">'+fmtDataBR(ds)+'</span><span class="mdp-count">'+listaDia.length+' entrega'+(listaDia.length===1?'':'s')+'</span>'+(pend>0?'<span class="mdp-badge">'+pend+' pend.</span>':'')+'</button>';
   }
   pillsHtml+='</div>';
-  var lista=(porDia[_motDiaSel]||[]).slice();lista.sort(function(a,b){var ordem={'Em Rota':0,Programado:1,Entregue:2},oa=ordem[a.status]!==undefined?ordem[a.status]:3,ob=ordem[b.status]!==undefined?ordem[b.status]:3;if(oa!==ob)return oa-ob;return (a.horaEntrega||'').localeCompare(b.horaEntrega||'');});
+  var lista=(porDia[_motDiaSel]||[]).slice();lista.sort(function(a,b){var horario=String(a.horaEntrega||'').localeCompare(String(b.horaEntrega||''));if(horario)return horario;return programacoes.indexOf(a)-programacoes.indexOf(b);});
   var cardsHtml='';for(var j=0;j<lista.length;j++)cardsHtml+=renderMotCard(lista[j]);
   var labelDiaSel=motDiaNomeCompleto(_motDiaSel)+' · '+fmtDataBR(_motDiaSel);
   conteudo.innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' '+esc(titulo)+'</h1><p>Entregas · '+esc(labelDiaSel)+' · '+lista.length+' entrega'+(lista.length===1?'':'s')+'</p></div>'+toolbar+pillsHtml+'<div class="mot-dia-cards">'+(cardsHtml||'<div class="empty">Nenhuma entrega neste dia.</div>')+'</div>';
 }
 function renderMotCard(p){
-  var cls=p.status==='Em Rota'?'emrota':p.status==='Entregue'?'entregue':'';
+  var cls=p.status==='Em Rota'?'emrota':p.status==='Entregue'?'entregue':'programado';
   var svgCheck='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   var tl1='<div class="mcc-tl-item done"><span class="mcc-tl-line"></span><span class="mcc-tl-dot">'+svgCheck+'</span><span class="mcc-tl-text"><b>Programado</b></span><span class="mcc-tl-hora">'+esc(p.horaEntrega||'')+'</span></div>';
   var tl2;
