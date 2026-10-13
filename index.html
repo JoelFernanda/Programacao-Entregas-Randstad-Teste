@@ -2125,7 +2125,14 @@ async function commitOperations(ops, epoch) {
       if (epoch !== syncEpoch) throw new Error('A sincronização foi interrompida.');
       const batch = writeBatch(db);
       if (op.type === 'delete') batch.delete(op.ref);
-      else batch.set(op.ref, op.data);
+      else if (op.ref && op.ref.parent && op.ref.parent.id === 'programacoes') {
+        const patch = {};
+        driverFields.forEach((field) => {
+          if (Object.prototype.hasOwnProperty.call(op.data, field)) patch[field] = op.data[field];
+        });
+        if (!Object.keys(patch).length) continue;
+        batch.update(op.ref, patch);
+      } else batch.set(op.ref, op.data);
       try { await batch.commit(); }
       catch (e) {
         const err = new Error(e && e.message ? e.message : 'Falha na gravação do motorista.');
