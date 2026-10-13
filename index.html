@@ -646,6 +646,42 @@ main#conteudo.tv-fullscreen .pedido-card.entregue .pc-status{background:#DDEBFA!
 .mot-photo-section{margin:0 0 12px}.mot-photo-heading{display:flex;flex-direction:column;gap:2px;margin:8px 0}.mot-photo-heading small{font-size:11px;color:var(--muted)}.mot-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.mot-photo-slot{min-width:0;display:flex;flex-direction:column;gap:5px}.mot-photo-image,.mot-photo-empty{width:100%;aspect-ratio:1;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px}.mot-photo-image{padding:0;cursor:zoom-in}.mot-photo-image img{width:100%;height:100%;object-fit:cover}.mot-photo-actions{display:flex;justify-content:center;gap:4px;flex-wrap:wrap}.mot-photo-actions .btn{min-width:34px;padding:5px 7px}.mot-photo-viewer{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px}.mot-photo-viewer-backdrop{position:absolute;inset:0;background:rgba(4,12,26,.84)}.mot-photo-viewer-panel{position:relative;z-index:1;width:min(100%,980px);max-height:95vh;max-height:95dvh;display:flex;flex-direction:column;background:var(--surface);color:var(--text);border-radius:16px;padding:12px;box-shadow:0 20px 60px rgba(0,0,0,.35)}.mot-photo-viewer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.mot-photo-viewer-panel img{width:100%;height:auto;max-height:calc(85vh - 105px);max-height:calc(85dvh - 105px);object-fit:contain;background:#0b1220;border-radius:10px}.mot-photo-viewer-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:10px 0 4px}.mot-photo-viewer-panel>small{text-align:center;color:var(--muted);font-size:11px}
 @media(max-width:800px){.mot-driver-picker{min-width:0;width:100%}main#conteudo.motorista-scroll{height:calc(100vh - 190px);height:calc(100dvh - 190px);min-height:260px;padding:12px 12px}.mot-driver-page>.page-head{margin-bottom:8px}.mot-driver-page>.mot-day-pills{padding-bottom:6px}}
 @media(max-width:520px){.mot-photo-grid{gap:5px}.mot-photo-actions .btn{min-width:29px;padding:5px}.mot-photo-viewer{padding:8px}.mot-photo-viewer-panel{padding:9px}.mot-photo-viewer-panel img{max-height:calc(80dvh - 100px)}}
+/* Cards do motorista: prioridade para leitura rápida no celular */
+.mot-driver-page>.mot-dia-cards{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:11px}
+.mot-cad-card.mot-delivery-card{padding:12px 14px;gap:8px;min-width:0;border-radius:15px}
+.mdc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.mdc-date-time{display:flex;flex-direction:column;gap:1px;min-width:0}
+.mdc-date-time>span,.mdc-client>span{font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#40566f}
+.mdc-date-time>b{font-size:15px;line-height:1.15;color:#172b43;font-variant-numeric:tabular-nums}
+.mdc-date-time>small{font-size:10px;font-weight:700;color:#40566f}
+.mdc-client{display:flex;flex-direction:column;gap:1px;min-width:0}
+.mdc-client>b{font-size:15px;line-height:1.25;font-weight:800;color:#172b43;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.mdc-references{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mdc-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border:1px solid rgba(55,78,104,.13);border-radius:7px;background:rgba(255,255,255,.72);font-size:10px;color:#29445f;max-width:100%;min-width:0}
+.mdc-chip small{font-size:8px;font-weight:800;text-transform:uppercase;color:#58708a}
+.mdc-chip b{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mdc-address{display:flex;align-items:flex-start;gap:6px;min-width:0;color:#334b62;font-size:10.5px;line-height:1.3}
+.mdc-address svg{width:13px;height:13px;flex:0 0 13px;color:#40566f;margin-top:1px}
+.mdc-address span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.mdc-details{display:flex;align-items:center;gap:7px 12px;flex-wrap:wrap;color:#334b62;font-size:10px}
+.mdc-details>span{display:inline-flex;align-items:center;gap:4px;min-width:0}
+.mdc-details svg{width:13px;height:13px;flex:none;color:#40566f}
+.mdc-details>span:first-child b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.mdc-volume{padding:2px 7px;border-radius:7px;background:rgba(255,255,255,.7);font-size:9px}
+.mdc-tags{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.mdc-tags .pill{font-size:8px;padding:2px 6px;min-height:18px}
+.mdc-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px 8px 5px;border:1px solid rgba(255,255,255,.8);border-radius:9px;background:rgba(255,255,255,.58)}
+.mdc-step{display:flex;align-items:flex-start;gap:5px;min-width:0;color:#738296}
+.mdc-step-dot{display:flex;align-items:center;justify-content:center;width:13px;height:13px;flex:0 0 13px;margin-top:1px;border:1.5px solid #b8c3cf;border-radius:50%;font-size:8px;font-weight:900;line-height:1}
+.mdc-step>div{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.mdc-step b{font-size:8.5px;white-space:nowrap}
+.mdc-step small{font-size:8px;color:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mdc-step.done .mdc-step-dot{background:#4a9b70;border-color:#4a9b70;color:#fff}
+.mdc-step.current .mdc-step-dot{border-width:3px;border-color:#bf7b37;background:#fff}
+.mot-cad-card.entregue .mdc-step.current .mdc-step-dot{border-color:#4d7bb7}
+.mdc-step.pending .mdc-step-dot{background:#edf1f5;border-color:#c8d1dc}
+.mdc-open-hint{text-align:right;font-size:8px;line-height:1;color:#536b82;opacity:.8;margin-top:-3px}
+@media(max-width:640px){.mot-driver-page>.mot-dia-cards{grid-template-columns:minmax(0,1fr);gap:9px;padding:3px 3px 12px}.mot-cad-card.mot-delivery-card{padding:11px 12px;gap:7px}.mdc-date-time>b{font-size:14px}.mdc-client>b{font-size:14px}.mdc-details>span:first-child b{max-width:145px}.mdc-progress{gap:3px;padding:6px 5px 4px}.mdc-step{gap:4px}.mdc-step b{font-size:8px}.mdc-open-hint{display:none}}
 </style>
 </head>
 <body>
@@ -1546,23 +1582,21 @@ function renderMotorista(){
 }
 function renderMotCard(p){
   var cls=p.status==='Em Rota'?'emrota':p.status==='Entregue'?'entregue':'programado';
-  var svgCheck='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  var tl1='<div class="mcc-tl-item done"><span class="mcc-tl-line"></span><span class="mcc-tl-dot">'+svgCheck+'</span><span class="mcc-tl-text"><b>Programado</b></span><span class="mcc-tl-hora">'+esc(p.horaEntrega||'')+'</span></div>';
-  var tl2;
-  if(p.status==='Em Rota'||p.status==='Entregue'){tl2='<div class="mcc-tl-item emrota"><span class="mcc-tl-line"></span><span class="mcc-tl-dot">'+svgCheck+'</span><span class="mcc-tl-text"><b>Em Rota</b></span><span class="mcc-tl-hora">'+esc(p.horaInicio||'-')+'</span></div>';}
-  else{tl2='<div class="mcc-tl-item pending"><span class="mcc-tl-line"></span><span class="mcc-tl-dot"></span><span class="mcc-tl-text">Em Rota</span><span class="mcc-tl-hora">—</span></div>';}
-  var tl3;
-  if(p.status==='Entregue'){tl3='<div class="mcc-tl-item entregue"><span class="mcc-tl-line"></span><span class="mcc-tl-dot">'+svgCheck+'</span><span class="mcc-tl-text"><b>Finalizada</b></span><span class="mcc-tl-hora">'+esc(p.horaFim||'-')+'</span></div>';}
-  else{tl3='<div class="mcc-tl-item pending"><span class="mcc-tl-line"></span><span class="mcc-tl-dot"></span><span class="mcc-tl-text">Finalizada</span><span class="mcc-tl-hora">—</span></div>';}
-  var tags='';
-  if(p.tipo)tags+=tipoPill(p.tipo);
-  if(p.regiao)tags+=' '+regiaoPill(p.regiao);
-  return '<div class="mot-cad-card '+cls+'" onclick="abrirModalMot(\''+esc(p.numero)+'\')">'
-    +'<div class="mcc-top"><div class="mcc-cad">'+esc(p.cad)+'</div>'+statusProgPill(p.status)+'</div>'
-    +(tags?'<div class="mcc-tags">'+tags+'</div>':'')
-    +'<div class="mcc-schedule"><div><span>Data da Entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b></div><div><span>Horário de Entrega</span><b>'+esc(p.horaEntrega||'Não informado')+'</b></div></div>'
-    +'<div class="mcc-info"><span>'+ICO.pin+' '+esc(p.endereco||'-')+'</span><span>'+ICO.user+' '+esc(p.motorista||'-')+'</span><span>'+ICO.truck+' '+esc(p.carro||'-')+' · '+p.volumes+' vol'+(p.numeroReq?' · '+esc(p.numeroReq):'')+'</span></div>'
-    +'<div class="mcc-timeline">'+tl1+tl2+tl3+'</div>'
+  var cadCliente=encontrarClientePorCad(p.cad),cliente=String(p.cliente|| (cadCliente?nomeClienteDoCad(cadCliente):'') || 'Cliente não informado');
+  var etapasRota=p.status==='Em Rota'||p.status==='Entregue',etapaFinal=p.status==='Entregue';
+  function etapa(classe,nome,hora){return '<div class="mdc-step '+classe+'"><span class="mdc-step-dot">'+(classe==='done'?'✓':'')+'</span><div><b>'+nome+'</b><small>'+esc(hora||'—')+'</small></div></div>';}
+  var progresso='<div class="mdc-progress">'+etapa('done','Programado','')+etapa(etapaFinal?'done':(etapasRota?'current':'pending'),'Em rota',p.horaInicio||'')+etapa(etapaFinal?'current':'pending','Entregue',p.horaFim||'')+'</div>';
+  var tags='';if(p.tipo)tags+=tipoPill(p.tipo);if(p.regiao)tags+=regiaoPill(p.regiao);
+  var pedido=p.numeroReq?'<span class="mdc-chip"><small>Req.</small><b>'+esc(p.numeroReq)+'</b></span>':'';
+  var volume=(p.volumes!==''&&p.volumes!=null)?p.volumes:'—';
+  return '<div class="mot-cad-card mot-delivery-card '+cls+'" onclick="abrirModalMot(\''+esc(p.numero)+'\')">'
+    +'<div class="mdc-top"><div class="mdc-date-time"><span>Data da entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b><small>Horário · '+esc(p.horaEntrega||'Não informado')+'</small></div>'+statusProgPill(p.status)+'</div>'
+    +'<div class="mdc-client"><span>Cliente</span><b>'+esc(cliente)+'</b></div>'
+    +'<div class="mdc-references"><span class="mdc-chip"><small>CAD</small><b>'+esc(p.cad||'-')+'</b></span>'+pedido+'</div>'
+    +'<div class="mdc-address">'+ICO.pin+'<span>'+esc(p.endereco||'Endereço não informado')+'</span></div>'
+    +'<div class="mdc-details"><span>'+ICO.truck+'<b>'+esc(p.carro||'Veículo não informado')+'</b></span><span class="mdc-volume"><b>'+esc(volume)+'</b> vol.</span>'+(tags?'<span class="mdc-tags">'+tags+'</span>':'')+'</div>'
+    +progresso
+    +'<div class="mdc-open-hint">Toque no card para ver os detalhes</div>'
     +'</div>';
 }
 function abrirModalMot(num){
