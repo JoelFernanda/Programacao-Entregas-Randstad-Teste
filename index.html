@@ -792,6 +792,33 @@ main#conteudo.dashboard-wide{max-width:1900px;width:100%;padding:22px clamp(12px
 @media(max-width:900px){.mot-driver-page>.mot-dia-cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:9px}}
 @media(max-width:640px){.mot-driver-page>.mot-dia-cards{grid-template-columns:minmax(0,1fr);gap:9px;padding:3px 3px 12px}.mot-driver-page .mot-driver-tv-card{padding:10px 11px;gap:6px}.mdc-identity{grid-template-columns:minmax(67px,.62fr) minmax(0,1.7fr);gap:7px;padding:7px 8px}.mdc-identity-cad b{font-size:14px}.mdc-identity-client b{font-size:10px}.mot-driver-page .mot-driver-tv-card .pc-line{grid-template-columns:63px minmax(0,1fr)}}
 
+/* Busca direta por requisição na lista de Programações */
+.prog-filter-req{display:flex;align-items:flex-end;gap:10px;margin:2px 0 10px;padding:10px 11px;border:1px solid #dce7f2;border-radius:12px;background:linear-gradient(135deg,#f8fbff,#eef5fc)}
+.prog-filter-req-field{flex:1;min-width:160px;max-width:430px}.prog-filter-req-field label{display:block;margin:0 0 4px 2px;color:#45617f;font-size:10px;font-weight:850;letter-spacing:.35px;text-transform:uppercase}.prog-filter-req-field input{width:100%;height:37px;padding:0 11px;border:1px solid #cbd9e8;border-radius:9px;background:#fff;color:#173554;font:inherit;font-size:12px;outline:none}.prog-filter-req-field input:focus{border-color:#2175D9;box-shadow:0 0 0 3px rgba(33,117,217,.12)}.prog-filter-clear{height:37px;padding:0 12px!important;font-size:10px!important}.prog-filter-count{margin:0 2px 9px auto;color:#6c8097;font-size:9px;font-weight:800;white-space:nowrap}.prog-row-card.prog-req-hidden{display:none!important}.prog-filter-empty{margin:5px 0 10px;padding:14px;border:1px dashed #bad0e7;border-radius:10px;background:#f7fbff;color:#58718d;font-size:12px}
+@media(max-width:640px){.prog-filter-req{align-items:stretch;flex-wrap:wrap;gap:7px;padding:9px}.prog-filter-req-field{flex-basis:100%;max-width:none}.prog-filter-clear{height:34px}.prog-filter-count{margin:0 0 0 auto;align-self:center;font-size:8px}}
+/* Painel TV sem animação de elevação/rotação ao passar o mouse */
+body.tv-display-mode #painelGrid.tv-card-wall .pedido-card,body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:hover,body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:active,body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:focus{transform:none!important;transform-style:flat!important}
+body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:hover{box-shadow:0 2px 5px rgba(0,0,0,.18),0 8px 16px rgba(0,0,0,.14)!important;filter:none!important}
+/* Motorista: grade de cartões independentes da Programação, com densidade de Painel TV */
+.mot-driver-page .mot-dia-cards{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr))!important;gap:12px!important;align-content:start!important;align-items:stretch!important}
+.mot-driver-page .mot-driver-panel-card{display:flex!important;flex-direction:column!important;width:auto!important;min-width:0!important;min-height:230px!important;height:auto!important;grid-column:auto!important;grid-row:auto!important;padding:11px 12px 10px!important;border-radius:15px!important;border-width:1.5px!important;box-shadow:0 4px 9px rgba(6,20,37,.19),0 11px 20px rgba(6,20,37,.15)!important}
+.mot-driver-page .mot-driver-panel-card:hover,.mot-driver-page .mot-driver-panel-card:active{transform:none!important;box-shadow:0 4px 9px rgba(6,20,37,.19),0 11px 20px rgba(6,20,37,.15)!important}
+.mot-driver-page .mot-driver-panel-card .mdc-identity{grid-template-columns:minmax(74px,.66fr) minmax(0,1.65fr);min-height:50px}
+@media(max-width:900px){.mot-driver-page .mot-dia-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,285px),1fr))!important;gap:9px!important}.mot-driver-page .mot-driver-panel-card{min-height:220px!important}}
+@media(max-width:640px){.mot-driver-page .mot-dia-cards{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}.mot-driver-page .mot-driver-panel-card{min-height:0!important;padding:10px 11px!important}}
+
+/* Motorista: quantidade de entregas não reduz tamanho; um card inteiro por linha, com rolagem */
+.mot-driver-page .mot-dia-cards{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:minmax(280px,max-content)!important;gap:12px!important;align-content:start!important;align-items:stretch!important}
+.mot-driver-page .mot-driver-panel-card{display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:280px!important;height:auto!important;grid-column:1/-1!important;grid-row:auto!important;align-self:stretch!important;justify-self:stretch!important;padding:14px 16px!important;gap:9px!important;border-radius:15px!important}
+.mot-driver-page .mot-driver-panel-card .pc-numero{font-size:13px!important}
+.mot-driver-page .mot-driver-panel-card .pc-line{font-size:10px!important}
+.mot-driver-page .mot-driver-panel-card .pc-line>b{font-size:10px!important}
+.mot-driver-page .mot-driver-panel-card .mdc-address{font-size:9.5px!important}
+.mot-driver-page .mot-driver-panel-card .pc-schedule-item b{font-size:11px!important}
+.mot-driver-page .mot-driver-panel-card .mdc-step b{font-size:8px!important}
+.mot-driver-page .mot-driver-panel-card .mdc-step small{font-size:7.5px!important}
+@media(max-width:640px){.mot-driver-page .mot-dia-cards{grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:minmax(270px,max-content)!important;gap:11px!important}.mot-driver-page .mot-driver-panel-card{min-height:270px!important;padding:12px 13px!important;gap:8px!important}}
+
 </style>
 </head>
 <body>
@@ -952,6 +979,7 @@ var _motMotoristaFiltro='*';
 var rastreadoresMotorista={},iniciosGPSPendentes={};
 var monitorMap=null,monitorMarkers={},monitorMapFitted=false,monitorMarkerSignature='',monitorRefreshTimer=null;
 var progEditando=null;
+var filtroRequisicaoProgramacao='';
 var progDetAberta=null;
 var editandoCliente=null;
 var importacaoCADsPendente=null;
@@ -1228,6 +1256,15 @@ function navSub(sub){
 }
 
 /* ============ MÓDULO PROGRAMAÇÃO ============ */
+function atualizarFiltroReqProgramacao(valor){filtroRequisicaoProgramacao=String(valor||'');aplicarFiltroReqProgramacaoDOM();}
+function limparFiltroReqProgramacao(){filtroRequisicaoProgramacao='';var input=document.getElementById('progFiltroReq');if(input)input.value='';aplicarFiltroReqProgramacaoDOM();}
+function aplicarFiltroReqProgramacaoDOM(){
+  var cards=document.querySelectorAll('#programacoesLista .prog-row-card'),needle=normalizarCabecalho(filtroRequisicaoProgramacao),shown=0;
+  for(var i=0;i<cards.length;i++){var req=normalizarCabecalho(cards[i].getAttribute('data-req')||''),match=!needle||req.indexOf(needle)>=0;cards[i].classList.toggle('prog-req-hidden',!match);if(match)shown++;}
+  var count=document.getElementById('progBuscaReqContagem');if(count)count.textContent=needle?shown+' de '+cards.length+' encontrada(s)':cards.length+' programação(ões)';
+  var badge=document.getElementById('progListCount');if(badge)badge.textContent=String(needle?shown:cards.length);
+  var empty=document.getElementById('progFiltroReqSemResultado');if(empty)empty.classList.toggle('hidden',!needle||shown>0||cards.length===0);
+}
 function renderProgramacao(){
   var pageMain=document.getElementById('conteudo');if(pageMain)pageMain.classList.add('prog-wide');
   var optsMot='';for(var m=0;m<MOTORISTAS.length;m++){optsMot+='<option value="'+MOTORISTAS[m]+'">'+MOTORISTAS[m]+'</option>';}
@@ -1242,7 +1279,7 @@ function renderProgramacao(){
   var cards='';
   for(var j=0;j<ordenadas.length;j++){
     var p=ordenadas[j],cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
-    cards+='<div class="prog-row-card '+cls+'">'
+    cards+='<div class="prog-row-card '+cls+'" data-req="'+esc(p.numeroReq||'')+'">'
       +'<div class="prog-row-date"><div class="prog-date-item"><span>Data da Entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b></div><div class="prog-date-item"><span>Horário de Entrega</span><b>'+esc(p.horaEntrega||'-')+'</b></div></div>'
       +'<div class="prog-row-content">'
         +'<div class="prog-row-main">'
@@ -1293,8 +1330,9 @@ function renderProgramacao(){
     +'<div class="field"><label>PDF</label><input class="input" type="file" id="progPDF" accept=".pdf"></div>'
     +'</div>'
     +'<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn ok" onclick="salvarProg()">'+btnSalvar+'</button>'+(progEditando?'<button class="btn danger" onclick="cancelarEdicaoProg()">Cancelar Edição</button>':'<button class="btn ghost" onclick="limparProgForm()">Limpar</button>')+'</div></div></div></div></div>'
-    +'<div class="card prog-list-card"><div class="prog-list-header"><div><h2>Programações Existentes</h2><div class="sub">'+programacoes.length+' cadastrada(s) · mais recentes primeiro.</div></div><div class="prog-list-tools-wrap">'+ferramentasHistorico+'<span class="prog-list-count">'+programacoes.length+'</span></div></div><div id="progImportPreview"></div><div class="prog-list-scroll" id="programacoesLista"><div class="prog-list-cards">'+cards+'</div></div></div>';
+    +'<div class="card prog-list-card"><div class="prog-list-header"><div><h2>Programações Existentes</h2><div class="sub">'+programacoes.length+' cadastrada(s) · mais recentes primeiro.</div></div><div class="prog-list-tools-wrap">'+ferramentasHistorico+'<span class="prog-list-count" id="progListCount">'+programacoes.length+'</span></div></div><div class="prog-filter-req"><div class="prog-filter-req-field"><label for="progFiltroReq">Buscar por nº da requisição</label><input type="search" id="progFiltroReq" value="'+esc(filtroRequisicaoProgramacao)+'" placeholder="Digite o número, ex.: 0100" autocomplete="off" oninput="atualizarFiltroReqProgramacao(this.value)"></div><button type="button" class="btn ghost sm prog-filter-clear" onclick="limparFiltroReqProgramacao()">Limpar busca</button><span class="prog-filter-count" id="progBuscaReqContagem">'+programacoes.length+' programação(ões)</span></div><div id="progFiltroReqSemResultado" class="empty hidden prog-filter-empty">Nenhuma requisição encontrada. Confira o número ou limpe a busca.</div><div id="progImportPreview"></div><div class="prog-list-scroll" id="programacoesLista"><div class="prog-list-cards">'+cards+'</div></div></div>';
   if(programacoesImportacaoPendente)renderPreviaImportacaoHistorico();
+  aplicarFiltroReqProgramacaoDOM();
   if(progEditando){
     var pEdit=encontrarProgPorNumero(progEditando);
     if(pEdit){setTimeout(function(){
@@ -1825,7 +1863,7 @@ function renderMotCard(p){
   var progresso='<div class="mdc-progress mot-tv-progress">'+etapa('done','Programado','')+etapa(etapaFinal?'done':(etapasRota?'current':'pending'),'Em rota',p.horaInicio||'')+etapa(etapaFinal?'current':'pending','Entregue',p.horaFim||'')+'</div>';
   var volume=(p.volumes!==''&&p.volumes!=null)?p.volumes:'—';
   var endereco=String(p.endereco||'Endereço não informado');
-  return '<div class="pedido-card mot-driver-tv-card '+cls+'" onclick="abrirModalMot(\''+esc(p.numero)+'\')" role="button" tabindex="0" aria-label="Req. '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+' · '+esc(cliente)+'">'
+  return '<div class="pedido-card mot-driver-tv-card mot-driver-panel-card '+cls+'" onclick="abrirModalMot(\''+esc(p.numero)+'\')" role="button" tabindex="0" aria-label="Req. '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+' · '+esc(cliente)+'">'
     +'<div class="pc-top"><span class="pc-numero">Req. '+esc(p.numeroReq||'-')+'</span><span class="pc-status">'+(p.status==='Em Rota'?ICO.truck+' ':'')+esc(p.status||'-')+'</span></div>'
     +'<div class="mdc-identity"><div class="mdc-identity-cad"><small>CAD</small><b>'+esc(p.cad||'-')+'</b></div><div class="mdc-identity-client"><small>CLIENTE</small><b>'+esc(cliente)+'</b></div></div>'
     +'<div class="pc-info mot-tv-info">'
