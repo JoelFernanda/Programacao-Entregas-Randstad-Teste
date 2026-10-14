@@ -881,12 +881,20 @@ function compararProgramacoesPorInclusao(a,b){
   var ta=instanteCriacaoProgramacao(a),tb=instanteCriacaoProgramacao(b);
   return ta===tb?0:tb-ta;
 }
+function chaveDataEntregaOrdenacao(v){
+  var s=String(v==null?'':v).trim(),m,y,mes,d;if(!s)return 0;
+  m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|[T\s])/);
+  if(m){y=Number(m[1]);mes=Number(m[2]);d=Number(m[3]);}
+  else{m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})(?:$|[T\s])/);if(m){d=Number(m[1]);mes=Number(m[2]);y=Number(m[3]);}else{var parsed=Date.parse(s);return isFinite(parsed)?Date.UTC(new Date(parsed).getFullYear(),new Date(parsed).getMonth(),new Date(parsed).getDate()):0;}}
+  var date=new Date(Date.UTC(y,mes-1,d));if(date.getUTCFullYear()!==y||date.getUTCMonth()!==mes-1||date.getUTCDate()!==d)return 0;return date.getTime();
+}
+function minutosHoraOrdenacao(v){var m=String(v==null?'':v).trim().match(/^(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
 function compararProgramacoesPorDataEntrega(a,b){
-  // Data de entrega mais nova primeiro. Status e número da requisição não alteram a ordem.
-  var da=String(a&&a.dataEntrega||'').trim(),db=String(b&&b.dataEntrega||'').trim();
-  if(da!==db)return db.localeCompare(da);
-  var ha=String(a&&a.horaEntrega||'').trim(),hb=String(b&&b.horaEntrega||'').trim();
-  if(ha!==hb){if(!ha)return 1;if(!hb)return -1;return ha.localeCompare(hb);}
+  // Agrupa pelo dia e coloca as datas mais novas primeiro; status e requisição não alteram a posição.
+  var da=chaveDataEntregaOrdenacao(a&&a.dataEntrega),db=chaveDataEntregaOrdenacao(b&&b.dataEntrega);
+  if(da!==db)return db-da;
+  var ha=minutosHoraOrdenacao(a&&a.horaEntrega),hb=minutosHoraOrdenacao(b&&b.horaEntrega);
+  if(ha!==hb){if(ha===null)return 1;if(hb===null)return -1;return ha-hb;}
   var recente=compararProgramacoesPorInclusao(a,b);if(recente)return recente;
   return String(b&&b.numero||'').localeCompare(String(a&&a.numero||''),'pt-BR',{numeric:true});
 }
