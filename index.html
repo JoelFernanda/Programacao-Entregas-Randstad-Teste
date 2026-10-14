@@ -819,6 +819,31 @@ body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:hover{box-shadow:0 2p
 .mot-driver-page .mot-driver-panel-card .mdc-step small{font-size:7.5px!important}
 @media(max-width:640px){.mot-driver-page .mot-dia-cards{grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:minmax(270px,max-content)!important;gap:11px!important}.mot-driver-page .mot-driver-panel-card{min-height:270px!important;padding:12px 13px!important;gap:8px!important}}
 
+/* Card compartilhado entre Painel TV e Motorista: conteúdo e dimensões constantes */
+.tv-shared-card{height:220px!important;min-height:220px!important;max-height:220px!important;padding:11px 12px!important;gap:6px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;box-sizing:border-box!important}
+.tv-shared-card .pc-top{flex:0 0 auto;min-height:18px}
+.tv-shared-card .pc-numero{font-size:12px!important;line-height:1.15}
+.tv-shared-card .pc-status{padding:3px 8px!important;font-size:8px!important;line-height:1.1}
+.pc-identity{display:grid;grid-template-columns:minmax(70px,.66fr) minmax(0,1.65fr);align-items:center;gap:8px;flex:0 0 38px;min-height:38px;padding:4px 8px;border:1px solid rgba(255,255,255,.72);border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 2px 6px rgba(0,45,75,.1);overflow:hidden}
+.pc-identity-cad,.pc-identity-client{display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0;line-height:1.05}
+.pc-identity-cad{padding-right:7px;border-right:1px solid #d9e4ec}
+.pc-identity small{font-size:6.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:#087b82}
+.pc-identity-cad b{font-size:13px;line-height:1.05;font-weight:950;color:#0b1740;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-identity-client b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere;font-size:9px;line-height:1.05;font-weight:850;color:#143a5b}
+.tv-shared-card .tv-shared-info{display:flex!important;flex:1 1 auto;min-height:0;flex-direction:column;justify-content:center;gap:2px!important;font-size:8px!important;overflow:hidden}
+.tv-shared-card .tv-shared-info .pc-line{display:grid;grid-template-columns:57px minmax(0,1fr);align-items:center;gap:5px;min-height:11px;line-height:1.05;font-size:8px!important}
+.tv-shared-card .tv-shared-info .pc-line>span{font-size:7px;white-space:nowrap;color:rgba(255,255,255,.78)}
+.tv-shared-card .tv-shared-info .pc-line>b{min-width:0;font-size:8px!important;line-height:1.05;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-shared-card .pc-schedule{flex:0 0 34px;min-height:34px;padding:4px 7px!important;margin:0!important;gap:7px!important;align-items:center!important}
+.tv-shared-card .pc-schedule-item{min-width:0;gap:1px}
+.tv-shared-card .pc-schedule-item span{font-size:6.5px!important;line-height:1.05}
+.tv-shared-card .pc-schedule-item b{font-size:9px!important;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Motorista: mesma largura de card de TV, um abaixo do outro e com rolagem */
+.mot-driver-page .mot-dia-cards{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;overflow-y:auto!important;overflow-x:hidden!important;padding:8px 6px 18px!important}
+.mot-driver-page .mot-driver-panel-card{flex:0 0 220px!important;width:min(100%,390px)!important;min-width:0!important;max-width:390px!important;min-height:220px!important;height:220px!important;max-height:220px!important;grid-column:auto!important;grid-row:auto!important;margin:0!important}
+.mot-driver-page .mot-driver-panel-card:hover,.mot-driver-page .mot-driver-panel-card:active{transform:none!important}
+@media(max-width:560px){.tv-shared-card{height:220px!important;min-height:220px!important;max-height:220px!important}.mot-driver-page .mot-dia-cards{align-items:stretch!important}.mot-driver-page .mot-driver-panel-card{width:100%!important;max-width:none!important}}
+
 </style>
 </head>
 <body>
@@ -1601,30 +1626,31 @@ function aplicarTemaSistema(){
   if(icon)icon.textContent=temaEscuroSistema?'☀':'☾';if(label)label.textContent=temaEscuroSistema?'Claro':'Escuro';if(headBtn){headBtn.title=temaEscuroSistema?'Ativar tema claro':'Ativar tema escuro';headBtn.setAttribute('aria-pressed',temaEscuroSistema?'true':'false');}
 }
 function alternarTemaSistema(){temaEscuroSistema=!temaEscuroSistema;aplicarTemaSistema();}
+function renderCardTVCompartilhado(p,modo){
+  var cls=p.status==='Em Rota'?'emrota':p.status==='Entregue'?'entregue':'programado';
+  var cCad=encontrarClientePorCad(p.cad),cliente=String(p.cliente||(cCad?nomeClienteDoCad(cCad):'')||'Cliente não informado');
+  var volume=(p.volumes!==''&&p.volumes!=null)?p.volumes:'—';
+  var horarios='Início '+String(p.horaInicio||'—')+' · Fim '+String(p.horaFim||'—');
+  var funcao=modo==='motorista'?'abrirModalMot':'verProgDet';
+  var classeExtra=modo==='motorista'?' mot-driver-panel-card':'';
+  return '<div class="pedido-card tv-shared-card '+cls+classeExtra+'" onclick="'+funcao+'(\''+esc(p.numero)+'\')" role="button" tabindex="0" aria-label="Req. '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+' · '+esc(cliente)+'">'
+    +'<div class="pc-top"><span class="pc-numero">Req. '+esc(p.numeroReq||'-')+'</span><span class="pc-status">'+(p.status==='Em Rota'?ICO.truck+' ':'')+esc(p.status||'-')+'</span></div>'
+    +'<div class="pc-identity"><div class="pc-identity-cad"><small>CAD</small><b>'+esc(p.cad||'-')+'</b></div><div class="pc-identity-client"><small>CLIENTE</small><b title="'+esc(cliente)+'">'+esc(cliente)+'</b></div></div>'
+    +'<div class="pc-info tv-shared-info">'
+      +'<div class="pc-line"><span>Região</span><b title="'+esc(p.regiao||'Não informada')+'">'+esc(p.regiao||'Não informada')+'</b></div>'
+      +'<div class="pc-line"><span>Motorista</span><b title="'+esc(p.motorista||'Não informado')+'">'+esc(p.motorista||'Não informado')+'</b></div>'
+      +'<div class="pc-line"><span>Veículo</span><b title="'+esc(p.carro||'Não informado')+'">'+esc(p.carro||'Não informado')+'</b></div>'
+      +'<div class="pc-line"><span>Volumes</span><b>'+esc(volume)+'</b></div>'
+      +'<div class="pc-line"><span>Horários</span><b title="'+esc(horarios)+'">'+esc(horarios)+'</b></div>'
+    +'</div>'
+    +'<div class="pc-schedule"><div class="pc-schedule-item"><span>Data da entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b></div><div class="pc-schedule-item"><span>Horário de entrega</span><b>'+esc(p.horaEntrega||'Não informado')+'</b></div></div>'
+    +'</div>';
+}
 function renderPainelGrid(){
   var grid=document.getElementById('painelGrid');if(!grid)return;
   if(programacoes.length===0){grid.innerHTML='<div class="empty" style="grid-column:1/-1">Nenhuma programação cadastrada.</div>';return;}
-  var ordenadas=programacoes.slice().sort(compararProgramacoesPorDataEntrega);
-  var cards='';
-  for(var i=0;i<ordenadas.length;i++){
-    var p=ordenadas[i];
-    var cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
-    cards+='<div class="pedido-card '+cls+'" onclick="verProgDet(\''+esc(p.numero)+'\')" style="cursor:pointer">'
-      +'<div class="pc-top"><span class="pc-numero">Req. '+esc(p.numeroReq||'-')+'</span><span class="pc-status">'+(p.status==='Em Rota'?ICO.truck+' ':'')+esc(p.status||'-')+'</span></div>'
-      +'<div class="pc-cad">'+esc(p.cad||'-')+'</div>'
-      +'<div class="pc-info">'
-        +'<div class="pc-line"><span>Região</span><b>'+esc(p.regiao||'-')+'</b></div>'
-        +'<div class="pc-line"><span>Motorista</span><b>'+esc(p.motorista||'-')+'</b></div>'
-        +'<div class="pc-line"><span>Volumes</span><b>'+esc(p.volumes||'-')+'</b></div>'
-        +(p.horaInicio?'<div class="pc-line"><span>Início</span><b>'+esc(p.horaInicio)+'</b></div>':'')
-        +(p.horaFim?'<div class="pc-line"><span>Fim</span><b>'+esc(p.horaFim)+'</b></div>':'')
-      +'</div>'
-      +'<div class="pc-schedule">'
-        +'<div class="pc-schedule-item"><span>Data da Entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b></div>'
-        +'<div class="pc-schedule-item"><span>Horário de Entrega</span><b>'+esc(p.horaEntrega||'Não informado')+'</b></div>'
-      +'</div>'
-    +'</div>';
-  }
+  var ordenadas=programacoes.slice().sort(compararProgramacoesPorDataEntrega),cards='';
+  for(var i=0;i<ordenadas.length;i++)cards+=renderCardTVCompartilhado(ordenadas[i],'painel');
   grid.innerHTML=cards;
 }
 
@@ -1855,30 +1881,7 @@ function renderMotorista(){
   var labelDiaSel=motDiaNomeCompleto(_motDiaSel)+' · '+fmtDataBR(_motDiaSel);
   conteudo.innerHTML='<div class="mot-driver-page"><div class="page-head"><h1>'+rocketIcon('md')+' '+esc(titulo)+'</h1><p>Entregas · '+esc(labelDiaSel)+' · '+lista.length+' entrega'+(lista.length===1?'':'s')+'</p></div>'+toolbar+pillsHtml+'<div class="mot-dia-cards">'+(cardsHtml||'<div class="empty">Nenhuma entrega neste dia.</div>')+'</div></div>';
 }
-function renderMotCard(p){
-  var cls=p.status==='Em Rota'?'emrota':p.status==='Entregue'?'entregue':'programado';
-  var cadCliente=encontrarClientePorCad(p.cad),cliente=String(p.cliente||(cadCliente?nomeClienteDoCad(cadCliente):'')||'Cliente não informado');
-  var etapasRota=p.status==='Em Rota'||p.status==='Entregue',etapaFinal=p.status==='Entregue';
-  function etapa(classe,nome,hora){return'<div class="mdc-step '+classe+'"><span class="mdc-step-dot">'+(classe==='done'?'✓':'')+'</span><div><b>'+nome+'</b><small>'+esc(hora||'—')+'</small></div></div>';}
-  var progresso='<div class="mdc-progress mot-tv-progress">'+etapa('done','Programado','')+etapa(etapaFinal?'done':(etapasRota?'current':'pending'),'Em rota',p.horaInicio||'')+etapa(etapaFinal?'current':'pending','Entregue',p.horaFim||'')+'</div>';
-  var volume=(p.volumes!==''&&p.volumes!=null)?p.volumes:'—';
-  var endereco=String(p.endereco||'Endereço não informado');
-  return '<div class="pedido-card mot-driver-tv-card mot-driver-panel-card '+cls+'" onclick="abrirModalMot(\''+esc(p.numero)+'\')" role="button" tabindex="0" aria-label="Req. '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+' · '+esc(cliente)+'">'
-    +'<div class="pc-top"><span class="pc-numero">Req. '+esc(p.numeroReq||'-')+'</span><span class="pc-status">'+(p.status==='Em Rota'?ICO.truck+' ':'')+esc(p.status||'-')+'</span></div>'
-    +'<div class="mdc-identity"><div class="mdc-identity-cad"><small>CAD</small><b>'+esc(p.cad||'-')+'</b></div><div class="mdc-identity-client"><small>CLIENTE</small><b>'+esc(cliente)+'</b></div></div>'
-    +'<div class="pc-info mot-tv-info">'
-      +'<div class="pc-line"><span>Região</span><b>'+esc(p.regiao||'Não informada')+'</b></div>'
-      +'<div class="pc-line"><span>Motorista</span><b>'+esc(p.motorista||'Não informado')+'</b></div>'
-      +'<div class="pc-line"><span>Veículo</span><b>'+esc(p.carro||'Não informado')+'</b></div>'
-      +'<div class="pc-line"><span>Volumes</span><b>'+esc(volume)+'</b></div>'
-      +(p.tipo?'<div class="pc-line"><span>Operação</span><b>'+esc(p.tipo)+'</b></div>':'')
-    +'</div>'
-    +'<div class="mdc-address mot-tv-address">'+ICO.pin+'<span>'+esc(endereco)+'</span></div>'
-    +'<div class="pc-schedule mot-tv-schedule"><div class="pc-schedule-item"><span>Data da entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b></div><div class="pc-schedule-item"><span>Horário</span><b>'+esc(p.horaEntrega||'Não informado')+'</b></div></div>'
-    +progresso
-    +'<div class="mdc-open-hint mot-tv-hint">Toque para ver detalhes ou atualizar o status</div>'
-    +'</div>';
-}
+function renderMotCard(p){return renderCardTVCompartilhado(p,'motorista');}
 function abrirModalMot(num){
   var p=encontrarProgPorNumero(num);if(!p)return;
   motProgAtual=num;
