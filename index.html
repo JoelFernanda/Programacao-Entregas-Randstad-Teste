@@ -896,6 +896,58 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
 
 .splash-ready-dot{display:inline-block;width:15px;height:15px;margin-right:8px;vertical-align:1px;border-radius:50%;background:#33c17d;box-shadow:0 0 0 4px rgba(51,193,125,.18)}
 
+
+/* Tela Programação: indicadores e filtros solicitados */
+.prog-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 14px}
+.prog-summary-card{position:relative;display:flex;min-width:0;min-height:106px;flex-direction:column;justify-content:center;gap:4px;padding:13px 16px;border:1px solid #d9e4ef;border-left:5px solid #2175d9;border-radius:13px;background:linear-gradient(145deg,#fff,#f5f9fd);box-shadow:0 3px 10px rgba(26,57,91,.07)}
+.prog-summary-card:before{content:'';position:absolute;right:12px;top:12px;width:9px;height:9px;border-radius:50%;background:#2175d9;opacity:.88}
+.prog-summary-card .prog-summary-label{font-size:12px;font-weight:800;color:#455b73;letter-spacing:.2px}
+.prog-summary-card .prog-summary-count{font-size:30px;line-height:1;font-weight:950;color:#17385b}
+.prog-summary-card small{font-size:10px;font-weight:700;color:#718399}
+.prog-summary-today{border-left-color:#2175d9}.prog-summary-today:before{background:#2175d9}
+.prog-summary-scheduled{border-left-color:#43b977}.prog-summary-scheduled:before{background:#43b977}.prog-summary-scheduled .prog-summary-count{color:#21643f}
+.prog-summary-route{border-left-color:#ed9946}.prog-summary-route:before{background:#ed9946}.prog-summary-route .prog-summary-count{color:#87460f}
+.prog-summary-done{border-left-color:#6d9fe9}.prog-summary-done:before{background:#6d9fe9}.prog-summary-done .prog-summary-count{color:#204e8a}
+.prog-filters-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(200px,1fr) auto;align-items:end;gap:10px;margin:2px 0 10px;padding:12px;border:1px solid #dce7f2;border-radius:12px;background:linear-gradient(135deg,#f8fbff,#eef5fc)}
+.prog-filter-field{display:flex;min-width:0;flex-direction:column;gap:5px}.prog-filter-field>span{font-size:11px;font-weight:800;color:#415870}
+.prog-clear-filters{min-height:40px;white-space:nowrap}
+@media(max-width:800px){.prog-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.prog-summary-card{min-height:92px;padding:11px 12px}.prog-summary-card .prog-summary-count{font-size:26px}.prog-filters-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.prog-clear-filters{grid-column:1/-1}}
+@media(max-width:480px){.prog-summary-grid{gap:7px}.prog-summary-card{min-height:82px;padding:9px 10px}.prog-summary-card .prog-summary-label{font-size:10px}.prog-summary-card .prog-summary-count{font-size:23px}.prog-filters-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Agenda mensal com seleção do dia e lista de entregas */
+.agenda-cell:not(.empty){cursor:pointer}.agenda-cell.selected{outline:3px solid #c8f23a;outline-offset:1px;border-color:#78a91c!important;box-shadow:0 0 0 4px rgba(200,242,58,.22),0 7px 15px rgba(20,45,75,.12)!important}
+.agenda-cell.has-events .agenda-day:after{content:'';display:inline-block;width:6px;height:6px;margin-left:5px;border-radius:50%;background:#43b977;vertical-align:2px}
+.agenda-day-panel{margin-top:14px;padding:14px;border:1px solid #dce6ef;border-radius:14px;background:linear-gradient(145deg,#fff,#f7faff);box-shadow:0 3px 10px rgba(20,45,75,.06)}
+.agenda-day-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.agenda-day-panel-head h2{margin:0;color:#17385b;font-size:17px}.agenda-day-panel-head span{display:block;margin-top:3px;color:#708197;font-size:11px;font-weight:700}
+.agenda-selected-list{display:flex;flex-direction:column;gap:7px}.agenda-selected-item{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid #dce7f2;border-left:5px solid #43b977;border-radius:10px;background:#fff;cursor:pointer;transition:background .12s,border-color .12s}.agenda-selected-item:hover{background:#f8fbff;border-color:#b8cee3}
+.agenda-selected-item.emrota{border-left-color:#ed9946}.agenda-selected-item.entregue{border-left-color:#6d9fe9}.agenda-selected-time{font-size:14px;color:#17385b}.agenda-selected-main{display:flex;min-width:0;flex-direction:column;gap:3px}.agenda-selected-main strong{font-size:12px;color:#263f59;overflow-wrap:anywhere}.agenda-selected-main span{font-size:10px;color:#6d7f92;overflow-wrap:anywhere}.agenda-selected-status{padding:5px 8px;border-radius:999px;background:#e5f7eb;color:#21643f;font-size:10px;font-weight:900;white-space:nowrap}.agenda-selected-item.emrota .agenda-selected-status{background:#fff0dc;color:#87460f}.agenda-selected-item.entregue .agenda-selected-status{background:#e7f0ff;color:#204e8a}.agenda-empty-day{margin:0;padding:16px}
+body.dark-mode .agenda-day-panel{background:linear-gradient(145deg,#121c2e,#10192a);border-color:#2b3b55}.dark-mode .agenda-day-panel-head h2{color:#e5efff}.dark-mode .agenda-selected-item{background:#152239;border-color:#30425c}.dark-mode .agenda-selected-main strong{color:#e5efff}.dark-mode .agenda-selected-main span{color:#aebed1}
+@media(max-width:560px){.agenda-day-panel{padding:10px}.agenda-day-panel-head h2{font-size:14px}.agenda-selected-item{grid-template-columns:48px minmax(0,1fr);gap:7px;padding:8px}.agenda-selected-time{font-size:12px}.agenda-selected-main strong{font-size:11px}.agenda-selected-main span{font-size:9px}.agenda-selected-status{grid-column:2;justify-self:start;padding:3px 7px}}
+
+/* O card do Motorista reutiliza a aparência aprovada do Painel TV Modelo 3 */
+.mot-driver-page .mot-dia-cards{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-rows:300px!important;align-items:stretch!important;gap:12px!important;padding:4px 2px 12px!important}
+.mot-driver-page .tv-shared-card{display:flex!important;flex-direction:column!important;min-width:0!important;width:100%!important;height:300px!important;min-height:300px!important;max-height:300px!important;margin:0!important;padding:0!important;gap:0!important;overflow:hidden!important;box-sizing:border-box!important;border:1px solid #cbd7e4!important;border-radius:13px!important;background:#f8fbff!important;color:#172b43!important;box-shadow:0 3px 8px rgba(0,0,0,.22)!important;transform:none!important;filter:none!important}
+.mot-driver-page .tv-shared-card:hover,.mot-driver-page .tv-shared-card:active{transform:none!important;box-shadow:0 3px 8px rgba(0,0,0,.22)!important;filter:none!important}
+.mot-driver-page .tv-shared-card .pc-top{display:flex!important;flex:0 0 40px!important;min-height:40px!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:0!important;padding:6px 10px!important;border-radius:12px 12px 0 0!important;background:#215b3c!important}
+.mot-driver-page .tv-shared-card.emrota .pc-top{background:#91400f!important}.mot-driver-page .tv-shared-card.entregue .pc-top{background:#204e8a!important}
+.mot-driver-page .tv-shared-card .pc-numero{color:#fff!important;font-size:14px!important;line-height:1.15!important;font-weight:900!important}
+.mot-driver-page .tv-shared-card .pc-status{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-height:27px!important;padding:4px 8px!important;border:1px solid #fff!important;border-radius:999px!important;background:#fff!important;color:#215b3c!important;font-size:12px!important;line-height:1.1!important;font-weight:950!important;white-space:nowrap!important}
+.mot-driver-page .tv-shared-card.emrota .pc-status{color:#91400f!important}.mot-driver-page .tv-shared-card.entregue .pc-status{color:#204e8a!important}.mot-driver-page .tv-shared-card .pc-status svg{width:16px!important;height:16px!important;flex:0 0 16px!important}
+.mot-driver-page .tv-shared-card .pc-identity{display:grid!important;grid-template-columns:minmax(80px,.58fr) minmax(0,1.7fr)!important;align-items:center!important;gap:8px!important;flex:0 0 auto!important;min-height:53px!important;margin:7px 9px 1px!important;padding:5px 8px!important;border:1px solid #d2dce6!important;border-radius:8px!important;background:#fff!important;overflow:hidden!important}
+.mot-driver-page .tv-shared-card .pc-identity small{display:block!important;font-size:9px!important;line-height:1.1!important;letter-spacing:.25px!important;color:#566f87!important}
+.mot-driver-page .tv-shared-card .pc-identity-cad b{display:block!important;font-size:20px!important;line-height:1.05!important;font-weight:950!important;color:#15599b!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.mot-driver-page .tv-shared-card .pc-identity-client b{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;font-size:14px!important;line-height:1.12!important;font-weight:900!important;color:#1e3d5b!important;overflow-wrap:anywhere!important}
+.mot-driver-page .tv-shared-card .tv-shared-info{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;flex:1 1 auto!important;min-height:0!important;align-content:center!important;gap:3px 9px!important;padding:5px 10px 7px!important;overflow:hidden!important;font-size:12px!important}
+.mot-driver-page .tv-shared-card .tv-shared-info .pc-line{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:2px!important;min-width:0!important;min-height:27px!important;padding:0 0 3px!important;border-bottom:1px solid #e3eaf1!important;line-height:1.12!important;font-size:12px!important}
+.mot-driver-page .tv-shared-card .tv-shared-info .pc-line>span{display:block!important;font-size:9px!important;line-height:1.1!important;font-weight:900!important;letter-spacing:.2px!important;text-transform:uppercase!important;color:#647c92!important;white-space:normal!important}
+.mot-driver-page .tv-shared-card .tv-shared-info .pc-line>b{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;min-width:0!important;font-size:12px!important;line-height:1.15!important;font-weight:800!important;text-align:left!important;color:#2c465f!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:anywhere!important}
+.mot-driver-page .tv-shared-card .pc-schedule{display:grid!important;grid-template-columns:1.1fr 1fr!important;flex:0 0 49px!important;min-height:49px!important;height:49px!important;align-items:center!important;gap:8px!important;margin:0 9px 8px!important;padding:5px 8px!important;border:1px solid #cbd9e6!important;border-radius:8px!important;background:#edf4fb!important}
+.mot-driver-page .tv-shared-card .pc-schedule-item{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;min-width:0!important}
+.mot-driver-page .tv-shared-card .pc-schedule-item span{font-size:9px!important;line-height:1.1!important;font-weight:900!important;color:#536c84!important}
+.mot-driver-page .tv-shared-card .pc-schedule-item b{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;font-size:14px!important;line-height:1.12!important;font-weight:950!important;color:#174574!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:anywhere!important}
+@media(max-width:1150px){.mot-driver-page .mot-dia-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:300px!important}}
+@media(max-width:760px){.mot-driver-page .mot-dia-cards{grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:300px!important;gap:10px!important}}
+
 </style>
 </head>
 <body>
@@ -1048,7 +1100,7 @@ var abastImportacaoPendente=null;
 var user=null, abaAtual=null;
 var tvClockInterval=null;
 var temaEscuroSistema=false,tvTemaEscuro=false;try{var temaSalvo=localStorage.getItem('randstad_system_theme');temaEscuroSistema=temaSalvo!==null?temaSalvo==='dark':localStorage.getItem('randstad_tv_dark')==='1';tvTemaEscuro=temaEscuroSistema;}catch(e){}
-var calAno=0,calMes=0;
+var calAno=0,calMes=0,calDiaSelecionado='';
 var motProgAtual=null;
 var _notifInterval=null;
 var _lastNotifSig='';
@@ -1059,6 +1111,7 @@ var rastreadoresMotorista={},iniciosGPSPendentes={};
 var monitorMap=null,monitorMarkers={},monitorMapFitted=false,monitorMarkerSignature='',monitorRefreshTimer=null;
 var progEditando=null;
 var filtroRequisicaoProgramacao='';
+var _progFiltroDataEntrega='',_progFiltroMotorista='*';
 var progDetAberta=null;
 var editandoCliente=null;
 var importacaoCADsPendente=null;
@@ -1417,11 +1470,22 @@ function atualizarFiltroReqProgramacao(valor){filtroRequisicaoProgramacao=String
 function limparFiltroReqProgramacao(){filtroRequisicaoProgramacao='';var input=document.getElementById('progFiltroReq');if(input)input.value='';aplicarFiltroReqProgramacaoDOM();}
 function aplicarFiltroReqProgramacaoDOM(){
   var cards=document.querySelectorAll('#programacoesLista .prog-row-card'),needle=normalizarCabecalho(filtroRequisicaoProgramacao),shown=0;
-  for(var i=0;i<cards.length;i++){var req=normalizarCabecalho(cards[i].getAttribute('data-req')||''),match=!needle||req.indexOf(needle)>=0;cards[i].classList.toggle('prog-req-hidden',!match);if(match)shown++;}
-  var count=document.getElementById('progBuscaReqContagem');if(count)count.textContent=needle?shown+' de '+cards.length+' encontrada(s)':cards.length+' programação(ões)';
-  var badge=document.getElementById('progListCount');if(badge)badge.textContent=String(needle?shown:cards.length);
-  var empty=document.getElementById('progFiltroReqSemResultado');if(empty)empty.classList.toggle('hidden',!needle||shown>0||cards.length===0);
+  var filtrosAtivos=!!needle||!!_progFiltroDataEntrega||(_progFiltroMotorista&&_progFiltroMotorista!=='*');
+  for(var i=0;i<cards.length;i++){
+    var card=cards[i],req=normalizarCabecalho(card.getAttribute('data-req')||'');
+    var data=card.getAttribute('data-date')||'',motorista=card.getAttribute('data-driver')||'';
+    var matchReq=!needle||req.indexOf(needle)>=0;
+    var matchData=!_progFiltroDataEntrega||data===_progFiltroDataEntrega;
+    var matchMotorista=!_progFiltroMotorista||_progFiltroMotorista==='*'||normalizarCabecalho(motorista)===normalizarCabecalho(_progFiltroMotorista);
+    var match=matchReq&&matchData&&matchMotorista;
+    card.classList.toggle('prog-req-hidden',!match);if(match)shown++;
+  }
+  var count=document.getElementById('progBuscaReqContagem');if(count)count.textContent=filtrosAtivos?shown+' de '+cards.length+' encontrada(s)':cards.length+' programação(ões)';
+  var badge=document.getElementById('progListCount');if(badge)badge.textContent=String(filtrosAtivos?shown:cards.length);
+  var empty=document.getElementById('progFiltroReqSemResultado');if(empty){empty.textContent='Nenhuma programação encontrada. Ajuste os filtros ou limpe a busca.';empty.classList.toggle('hidden',!filtrosAtivos||shown>0||cards.length===0);}
 }
+function atualizarFiltrosProgramacao(){var d=document.getElementById('progFiltroDataEntrega'),m=document.getElementById('progFiltroMotorista');_progFiltroDataEntrega=d?d.value:'';_progFiltroMotorista=m?m.value:'*';aplicarFiltroReqProgramacaoDOM();}
+function limparFiltrosProgramacao(){_progFiltroDataEntrega='';_progFiltroMotorista='*';filtroRequisicaoProgramacao='';var d=document.getElementById('progFiltroDataEntrega'),m=document.getElementById('progFiltroMotorista'),q=document.getElementById('progFiltroReq');if(d)d.value='';if(m)m.value='*';if(q)q.value='';aplicarFiltroReqProgramacaoDOM();}
 function renderProgramacao(){
   var pageMain=document.getElementById('conteudo');if(pageMain)pageMain.classList.add('prog-wide');
   var optsMot='';for(var m=0;m<MOTORISTAS.length;m++){optsMot+='<option value="'+MOTORISTAS[m]+'">'+MOTORISTAS[m]+'</option>';}
@@ -1432,11 +1496,32 @@ function renderProgramacao(){
   for(var tt=0;tt<TIPOS.length;tt++){optsTipo+='<option value="'+esc(TIPOS[tt])+'">'+esc(TIPOS[tt])+'</option>';}
   var optsCliente='<option value="">-- Selecione --</option>';
   for(var cc=0;cc<clientes.length;cc++){var cliOpt=clientes[cc],nomeCliOpt=nomeClienteDoCad(cliOpt);optsCliente+='<option value="'+esc(cliOpt.cad)+'">'+esc(cliOpt.cad)+(nomeCliOpt?' - '+esc(nomeCliOpt):'')+'</option>';}
+  var hojeResumo=motDiaHojeStr();
+  var qtdHoje=programacoes.filter(function(x){return x.dataEntrega===hojeResumo;}).length;
+  var qtdProgramado=programacoes.filter(function(x){return x.status==='Programado';}).length;
+  var qtdEmRota=programacoes.filter(function(x){return x.status==='Em Rota';}).length;
+  var qtdEntregue=programacoes.filter(function(x){return x.status==='Entregue';}).length;
+  var resumoHtml='<div class="prog-summary-grid">'
+    +'<div class="prog-summary-card prog-summary-today"><span class="prog-summary-label">Programação de hoje</span><b class="prog-summary-count">'+qtdHoje+'</b><small>'+esc(fmtDataBR(hojeResumo))+'</small></div>'
+    +'<div class="prog-summary-card prog-summary-scheduled"><span class="prog-summary-label">Programado</span><b class="prog-summary-count">'+qtdProgramado+'</b><small>entregas</small></div>'
+    +'<div class="prog-summary-card prog-summary-route"><span class="prog-summary-label">Em Rota</span><b class="prog-summary-count">'+qtdEmRota+'</b><small>entregas</small></div>'
+    +'<div class="prog-summary-card prog-summary-done"><span class="prog-summary-label">Entregue</span><b class="prog-summary-count">'+qtdEntregue+'</b><small>entregas</small></div>'
+    +'</div>';
+  var motoristasFiltro=[];programacoes.forEach(function(x){var nome=String(x.motorista||'').trim();if(nome&&motoristasFiltro.indexOf(nome)<0)motoristasFiltro.push(nome);});
+  motoristasFiltro.sort(function(a,b){return a.localeCompare(b,'pt-BR');});
+  if(_progFiltroMotorista!=='*'&&motoristasFiltro.indexOf(_progFiltroMotorista)<0)_progFiltroMotorista='*';
+  var optsFiltroMotorista='<option value="*"'+(_progFiltroMotorista==='*'?' selected':'')+'>Todos os motoristas</option>';
+  motoristasFiltro.forEach(function(nome){optsFiltroMotorista+='<option value="'+esc(nome)+'"'+(nome===_progFiltroMotorista?' selected':'')+'>'+esc(nome)+'</option>';});
+  var filtrosHtml='<div class="prog-filters-grid">'
+    +'<label class="prog-filter-field"><span>Data de entrega</span><input class="input" type="date" id="progFiltroDataEntrega" value="'+esc(_progFiltroDataEntrega)+'" onchange="atualizarFiltrosProgramacao()"></label>'
+    +'<label class="prog-filter-field"><span>Motorista</span><select class="input" id="progFiltroMotorista" onchange="atualizarFiltrosProgramacao()">'+optsFiltroMotorista+'</select></label>'
+    +'<button type="button" class="btn ghost prog-clear-filters" onclick="limparFiltrosProgramacao()">Limpar filtros</button>'
+    +'</div>';
   var ordenadas=programacoes.slice().sort(compararProgramacoesPorDataEntrega);
   var cards='';
   for(var j=0;j<ordenadas.length;j++){
     var p=ordenadas[j],cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
-    cards+='<div class="prog-row-card '+cls+'" data-req="'+esc(p.numeroReq||'')+'">'
+    cards+='<div class="prog-row-card '+cls+'" data-req="'+esc(p.numeroReq||'')+'" data-date="'+esc(p.dataEntrega||'')+'" data-driver="'+esc(p.motorista||'')+'" data-status="'+esc(p.status||'')+'">'
       +'<div class="prog-row-date"><div class="prog-date-item"><span>Data da Entrega</span><b>'+esc(fmtDataBR(p.dataEntrega)||'-')+'</b></div><div class="prog-date-item"><span>Horário de Entrega</span><b>'+esc(p.horaEntrega||'-')+'</b></div></div>'
       +'<div class="prog-row-content">'
         +'<div class="prog-row-main">'
@@ -1466,6 +1551,7 @@ function renderProgramacao(){
   var ferramentasHistorico=(user&&user.role==='Gestor')?'<div class="prog-list-tools"><input type="file" id="progHistoricoFile" accept=".xlsx,.xls,.csv" onchange="prepararImportacaoHistoricoProgramacoes(this)" style="display:none"><button class="btn blue sm" onclick="document.getElementById(\'progHistoricoFile\').click()">Subir planilha</button></div>':'';
   document.getElementById('conteudo').innerHTML=
     '<div class="page-head prog-home-head"><div><h1>'+rocketIcon('md')+' Programação de Entregas</h1><p>Cadastre e gerencie as entregas.</p></div><button type="button" class="prog-home-new" onclick="toggleAcc(&quot;acc-novaProg&quot;)"><span class="prog-home-plus">+</span><span>'+(progEditando?'Editar Programação':'Nova Programação')+'</span></button></div>'
+    +resumoHtml
     +'<div class="prog-form-pin"><div class="acc '+(progEditando?'open':'')+'" id="acc-novaProg"><div class="acc-head" onclick="toggleAcc(\'acc-novaProg\')"><div class="acc-title"><div class="acc-ic">'+rocketIcon('sm')+'<span class="sigla-badge">'+(progEditando?'EDIT':'NOVA')+'</span></div><div><div class="acc-name">'+tituloAcc+'</div><div class="acc-meta">'+metaAcc+'</div></div></div><div class="chev"></div></div>'
     +'<div class="acc-body"><div class="acc-body-inner" style="padding-top:16px">'
     +'<div class="grid grid-3">'
@@ -1487,7 +1573,7 @@ function renderProgramacao(){
     +'<div class="field"><label>PDF</label><input class="input" type="file" id="progPDF" accept=".pdf"></div>'
     +'</div>'
     +'<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn ok" onclick="salvarProg()">'+btnSalvar+'</button>'+(progEditando?'<button class="btn danger" onclick="cancelarEdicaoProg()">Cancelar Edição</button>':'<button class="btn ghost" onclick="limparProgForm()">Limpar</button>')+'</div></div></div></div></div>'
-    +'<div class="card prog-list-card"><div class="prog-list-header"><div><h2>Programações Existentes</h2><div class="sub">'+programacoes.length+' cadastrada(s) · mais recentes primeiro.</div></div><div class="prog-list-tools-wrap">'+ferramentasHistorico+'<span class="prog-list-count" id="progListCount">'+programacoes.length+'</span></div></div><div class="prog-filter-req"><div class="prog-filter-req-field"><label for="progFiltroReq">Buscar por nº da requisição</label><input type="search" id="progFiltroReq" value="'+esc(filtroRequisicaoProgramacao)+'" placeholder="Digite o número, ex.: 0100" autocomplete="off" oninput="atualizarFiltroReqProgramacao(this.value)"></div><button type="button" class="btn ghost sm prog-filter-clear" onclick="limparFiltroReqProgramacao()">Limpar busca</button><span class="prog-filter-count" id="progBuscaReqContagem">'+programacoes.length+' programação(ões)</span></div><div id="progFiltroReqSemResultado" class="empty hidden prog-filter-empty">Nenhuma requisição encontrada. Confira o número ou limpe a busca.</div><div id="progImportPreview"></div><div class="prog-list-scroll" id="programacoesLista"><div class="prog-list-cards">'+cards+'</div></div></div>';
+    +'<div class="card prog-list-card"><div class="prog-list-header"><div><h2>Programações Existentes</h2><div class="sub">'+programacoes.length+' cadastrada(s) · mais recentes primeiro.</div></div><div class="prog-list-tools-wrap">'+ferramentasHistorico+'<span class="prog-list-count" id="progListCount">'+programacoes.length+'</span></div></div>'+filtrosHtml+'<div class="prog-filter-req"><div class="prog-filter-req-field"><label for="progFiltroReq">Buscar por nº da requisição</label><input type="search" id="progFiltroReq" value="'+esc(filtroRequisicaoProgramacao)+'" placeholder="Digite o número, ex.: 0100" autocomplete="off" oninput="atualizarFiltroReqProgramacao(this.value)"></div><button type="button" class="btn ghost sm prog-filter-clear" onclick="limparFiltroReqProgramacao()">Limpar busca</button><span class="prog-filter-count" id="progBuscaReqContagem">'+programacoes.length+' programação(ões)</span></div><div id="progFiltroReqSemResultado" class="empty hidden prog-filter-empty">Nenhuma requisição encontrada. Confira o número ou limpe a busca.</div><div id="progImportPreview"></div><div class="prog-list-scroll" id="programacoesLista"><div class="prog-list-cards">'+cards+'</div></div></div>';
   if(programacoesImportacaoPendente)renderPreviaImportacaoHistorico();
   aplicarFiltroReqProgramacaoDOM();
   if(progEditando){
@@ -1702,44 +1788,63 @@ function renderAgenda(){
     '<div class="page-head"><h1>'+rocketIcon('md')+' Agenda de Entregas</h1><p>Visualize as entregas do mês por dia útil.</p></div>'
     +'<div class="card">'
     +'<div class="agenda-toolbar"><div class="agenda-nav"><button onclick="calMudarMes(-1)">‹</button><span class="agenda-title" id="agendaTitulo"></span><button onclick="calMudarMes(1)">›</button><button onclick="calHoje()" style="margin-left:6px">Hoje</button></div><div class="agenda-legend"><span><i class="programado"></i> Programado</span><span><i class="emrota"></i> Em Rota</span><span><i class="entregue"></i> Entregue</span></div></div>'
-    +'<div id="agendaGrid"></div><div class="agenda-mobile-hint">No celular, deslize na horizontal para ver toda a semana.</div>'
+    +'<div id="agendaGrid"></div><div id="agendaDiaSelecionado"></div><div class="agenda-mobile-hint">No celular, deslize na horizontal para ver toda a semana.</div>'
     +'</div>';
   renderAgendaGrid();
 }
-function calMudarMes(delta){calMes+=delta;if(calMes<0){calMes=11;calAno--;}if(calMes>11){calMes=0;calAno++;}renderAgendaGrid();}
-function calHoje(){var h=new Date();calAno=h.getFullYear();calMes=h.getMonth();renderAgendaGrid();}
+function calMudarMes(delta){calMes+=delta;if(calMes<0){calMes=11;calAno--;}if(calMes>11){calMes=0;calAno++;}calDiaSelecionado='';renderAgendaGrid();}
+function calHoje(){var h=new Date();calAno=h.getFullYear();calMes=h.getMonth();calDiaSelecionado=h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0')+'-'+String(h.getDate()).padStart(2,'0');renderAgendaGrid();}
 function renderAgendaGrid(){
   var el=document.getElementById('agendaGrid');if(!el)return;
   var nomesMes=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   var titulo=document.getElementById('agendaTitulo');if(titulo)titulo.textContent=nomesMes[calMes]+' '+calAno;
-  var hoje=new Date();
-  var diasNoMes=new Date(calAno,calMes+1,0).getDate();
-  var diasUteis=[];
-  for(var d=1;d<=diasNoMes;d++){var dt=new Date(calAno,calMes,d);var dow=dt.getDay();if(dow>=1&&dow<=5)diasUteis.push({dia:d,dow:dow,date:dt});}
-  var offset=diasUteis.length>0?(diasUteis[0].dow-1):0;
-  var totalCells=offset+diasUteis.length;
-  var rows=Math.ceil(totalCells/5);
-  var totalGrid=rows*5;
+  var hoje=new Date(),prefix=calAno+'-'+String(calMes+1).padStart(2,'0');
+  var hojeIso=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  if(!calDiaSelecionado||calDiaSelecionado.slice(0,7)!==prefix){
+    if(hojeIso.slice(0,7)===prefix)calDiaSelecionado=hojeIso;
+    else{
+      var datasMes=programacoes.map(function(p){return p.dataEntrega||'';}).filter(function(ds){if(ds.slice(0,7)!==prefix)return false;var dow=new Date(ds+'T12:00:00').getDay();return dow>=1&&dow<=5;}).sort();
+      if(datasMes.length)calDiaSelecionado=datasMes[0];
+      else{var primeiro=new Date(calAno,calMes,1);while(primeiro.getDay()===0||primeiro.getDay()===6)primeiro.setDate(primeiro.getDate()+1);calDiaSelecionado=calAno+'-'+String(calMes+1).padStart(2,'0')+'-'+String(primeiro.getDate()).padStart(2,'0');}
+    }
+  }
+  var diasNoMes=new Date(calAno,calMes+1,0).getDate(),diasUteis=[];
+  for(var d=1;d<=diasNoMes;d++){var dt=new Date(calAno,calMes,d),dow=dt.getDay();if(dow>=1&&dow<=5)diasUteis.push({dia:d,dow:dow,date:dt});}
+  var offset=diasUteis.length>0?(diasUteis[0].dow-1):0,totalCells=offset+diasUteis.length,rows=Math.ceil(totalCells/5),totalGrid=rows*5;
   var html='<div class="agenda-week-head"><div>Segunda</div><div>Terça</div><div>Quarta</div><div>Quinta</div><div>Sexta</div></div><div class="agenda-grid">';
   for(var i=0;i<totalGrid;i++){
-    if(i<offset||i>=offset+diasUteis.length){html+='<div class="agenda-cell empty"></div>';}
+    if(i<offset||i>=offset+diasUteis.length)html+='<div class="agenda-cell empty"></div>';
     else{
-      var dayObj=diasUteis[i-offset];var dia=dayObj.dia;
-      var isHoje=(hoje.getFullYear()===calAno&&hoje.getMonth()===calMes&&hoje.getDate()===dia);
-      var progs=programacoes.filter(function(p){var dt=new Date(p.dataEntrega+'T00:00');return dt.getFullYear()===calAno&&dt.getMonth()===calMes&&dt.getDate()===dia;});
-      progs.sort(function(a,b){return a.horaEntrega.localeCompare(b.horaEntrega);});
-      html+='<div class="agenda-cell'+(isHoje?' today':'')+'"><div class="agenda-day">'+dia+'</div>';
-      if(progs.length>0){html+='<div class="agenda-progs">';
-        for(var j=0;j<progs.length;j++){var p=progs[j];var cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
-          html+='<div class="agenda-prog '+cls+'" onclick="verProgDet(\''+esc(p.numero)+'\')" title="'+esc(p.horaEntrega||'')+' · '+esc(p.cad||'')+' · Motorista: '+esc(p.motorista||'-')+' · Req.: '+esc(p.numeroReq||'-')+'"><b>'+esc(p.horaEntrega||'--:--')+' · '+esc(p.cad||'-')+'</b><span class="agenda-prog-meta">Motorista: '+esc(p.motorista||'-')+'</span><span class="agenda-prog-meta">Req.: '+esc(p.numeroReq||'-')+'</span></div>';}
-        html+='</div>';}
+      var dia=diasUteis[i-offset].dia,dataIso=prefix+'-'+String(dia).padStart(2,'0');
+      var isHoje=hojeIso===dataIso,selecionado=calDiaSelecionado===dataIso;
+      var progs=programacoes.filter(function(p){return p.dataEntrega===dataIso;});
+      progs.sort(function(a,b){return String(a.horaEntrega||'').localeCompare(String(b.horaEntrega||''));});
+      html+='<div class="agenda-cell'+(isHoje?' today':'')+(selecionado?' selected':'')+(progs.length?' has-events':'')+'" role="button" tabindex="0" aria-pressed="'+selecionado+'" onclick="calSelecionarDia(\''+dataIso+'\')"><div class="agenda-day">'+dia+'</div>';
+      if(progs.length){html+='<div class="agenda-progs">';
+        for(var j=0;j<progs.length;j++){var p=progs[j],cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
+          html+='<div class="agenda-prog '+cls+'" onclick="event.stopPropagation();verProgDet(\''+esc(p.numero)+'\')" title="'+esc(p.horaEntrega||'')+' · '+esc(p.cad||'')+' · Motorista: '+esc(p.motorista||'-')+' · Req.: '+esc(p.numeroReq||'-')+'"><b>'+esc(p.horaEntrega||'--:--')+' · '+esc(p.cad||'-')+'</b><span class="agenda-prog-meta">Motorista: '+esc(p.motorista||'-')+'</span><span class="agenda-prog-meta">Req.: '+esc(p.numeroReq||'-')+'</span></div>';
+        }
+        html+='</div>';
+      }
       html+='</div>';
     }
   }
-  html+='</div>';
-  el.innerHTML=html;
+  el.innerHTML=html+'</div>';
+  renderAgendaDiaSelecionado();
 }
-
+function calSelecionarDia(dataIso){calDiaSelecionado=dataIso;renderAgendaGrid();}
+function renderAgendaDiaSelecionado(){
+  var el=document.getElementById('agendaDiaSelecionado');if(!el||!calDiaSelecionado)return;
+  var data=new Date(calDiaSelecionado+'T12:00:00'),nomes=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  var lista=programacoes.filter(function(p){return p.dataEntrega===calDiaSelecionado;}).slice().sort(function(a,b){return String(a.horaEntrega||'').localeCompare(String(b.horaEntrega||''));});
+  var linhas='';
+  lista.forEach(function(p){
+    var cls=p.status==='Programado'?'programado':p.status==='Em Rota'?'emrota':'entregue';
+    var cadastro=encontrarClientePorCad(p.cad),cliente=String(p.cliente||(cadastro?nomeClienteDoCad(cadastro):'')||'Cliente não informado');
+    linhas+='<div class="agenda-selected-item '+cls+'" role="button" tabindex="0" onclick="verProgDet(\''+esc(p.numero)+'\')"><b class="agenda-selected-time">'+esc(p.horaEntrega||'--:--')+'</b><div class="agenda-selected-main"><strong>'+esc(p.cad||'-')+' · '+esc(cliente)+'</strong><span>Req. '+esc(p.numeroReq||'-')+' · Motorista: '+esc(p.motorista||'-')+'</span></div><span class="agenda-selected-status">'+esc(p.status||'-')+'</span></div>';
+  });
+  el.innerHTML='<section class="agenda-day-panel"><div class="agenda-day-panel-head"><div><h2>Entregas de '+esc(nomes[data.getDay()])+' · '+esc(fmtDataBR(calDiaSelecionado))+'</h2><span>'+lista.length+' entrega'+(lista.length===1?'':'s')+' neste dia</span></div><button type="button" class="btn ghost sm" onclick="calHoje()">Hoje</button></div>'+(linhas?'<div class="agenda-selected-list">'+linhas+'</div>':'<div class="empty agenda-empty-day">Nenhuma entrega nesta data.</div>')+'</section>';
+}
 /* ============ MÓDULO PAINEL TV ============ */
 function sairPainelTV(){navSub('programacao');}
 function renderPainel(){
@@ -1764,8 +1869,7 @@ function renderCardTVCompartilhado(p,modo){
   var volume=(p.volumes!==''&&p.volumes!=null)?p.volumes:'—';
   var horarios='Início '+String(p.horaInicio||'—')+' · Fim '+String(p.horaFim||'—');
   var funcao=modo==='motorista'?'abrirModalMot':'verProgDet';
-  var classeExtra=modo==='motorista'?' mot-driver-panel-card':'';
-  return '<div class="pedido-card tv-shared-card '+cls+classeExtra+'" onclick="'+funcao+'(\''+esc(p.numero)+'\')" role="button" tabindex="0" aria-label="Req. '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+' · '+esc(cliente)+'">'
+  return '<div class="pedido-card tv-shared-card '+cls+'" onclick="'+funcao+'(\''+esc(p.numero)+'\')" role="button" tabindex="0" aria-label="Req. '+esc(p.numeroReq||'-')+' · CAD '+esc(p.cad||'-')+' · '+esc(cliente)+'">'
     +'<div class="pc-top"><span class="pc-numero">Req. '+esc(p.numeroReq||'-')+'</span><span class="pc-status">'+(p.status==='Em Rota'?ICO.truck+' ':'')+esc(p.status||'-')+'</span></div>'
     +'<div class="pc-identity"><div class="pc-identity-cad"><small>CAD</small><b>'+esc(p.cad||'-')+'</b></div><div class="pc-identity-client"><small>CLIENTE</small><b title="'+esc(cliente)+'">'+esc(cliente)+'</b></div></div>'
     +'<div class="pc-info tv-shared-info">'
