@@ -686,20 +686,27 @@ main#conteudo.tv-fullscreen .pedido-card.entregue .pc-status{background:#DDEBFA!
 body.tv-display-mode{height:100%;overflow:hidden;background:#07072e}
 body.tv-display-mode #topo,body.tv-display-mode #menu,body.tv-display-mode #credits{display:none!important}
 body.tv-display-mode main#conteudo.tv-fullscreen{position:fixed;inset:0;z-index:800;width:100vw;max-width:none;height:100vh;height:100dvh;min-height:100vh;min-height:100dvh;margin:0;padding:16px 20px 82px;overflow-x:hidden;overflow-y:auto;background:#07072e!important;color:#f6fbff}
-body.tv-display-mode #painelGrid.tv-card-wall{width:min(100%,1900px);max-width:1900px;margin:0 auto;padding:4px 2px 82px;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-content:start}
-body.tv-display-mode #painelGrid.tv-card-wall .pedido-card{min-height:170px;padding:16px 17px;gap:9px}
-body.tv-display-mode #painelGrid.tv-card-wall .pc-cad{font-size:22px}
-body.tv-display-mode #painelGrid.tv-card-wall .pc-info{font-size:13px;gap:5px}
-body.tv-display-mode #painelGrid.tv-card-wall .pc-line b{font-size:13px}
-body.tv-display-mode #painelGrid.tv-card-wall .pc-schedule{padding:10px 12px}
-body.tv-display-mode #painelGrid.tv-card-wall .pc-schedule-item span{font-size:10px}
-body.tv-display-mode #painelGrid.tv-card-wall .pc-schedule-item b{font-size:14px}
+body.tv-display-mode #painelGrid.tv-card-wall{width:min(100%,1900px);max-width:1900px;margin:0 auto;padding:4px 2px 82px;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-content:start}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card{height:auto!important;min-height:340px!important;max-height:none!important;padding:22px 24px!important;gap:14px!important;overflow:visible!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-numero{font-size:18px!important;line-height:1.25}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status{padding:7px 12px!important;font-size:14px!important;line-height:1.2}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity{grid-template-columns:minmax(110px,.7fr) minmax(0,1.7fr);flex:0 0 auto;min-height:68px;padding:8px 12px;gap:12px;overflow:visible}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity small{font-size:11px!important;line-height:1.2}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-cad b{font-size:22px!important;line-height:1.2;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-client b{display:block;-webkit-line-clamp:unset;overflow:visible;overflow-wrap:anywhere;font-size:18px!important;line-height:1.25}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info{flex:1 0 auto;min-height:0;gap:8px!important;font-size:17px!important;overflow:visible!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line{grid-template-columns:minmax(105px,.38fr) minmax(0,1fr);align-items:start;gap:12px;min-height:22px;line-height:1.25;font-size:17px!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>span{font-size:16px!important;line-height:1.25;white-space:normal;color:#172B43!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>b{min-width:0;font-size:17px!important;line-height:1.25;text-align:left;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;color:#172B43!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule{flex:0 0 auto;min-height:64px;height:auto;padding:10px 14px!important;gap:14px!important;align-items:flex-start!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item span{font-size:12px!important;line-height:1.25}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item b{font-size:17px!important;line-height:1.25;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
 body.tv-display-mode .tv-exit-button{position:fixed;right:22px;bottom:18px;z-index:1400;display:flex;align-items:center;gap:8px;padding:11px 16px;border:1px solid rgba(255,255,255,.38);border-radius:999px;background:rgba(15,25,65,.94);color:#fff;font-size:13px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.35);cursor:pointer}
 body.tv-display-mode .tv-exit-button:hover{background:#2175D9;transform:translateY(-1px)}
-@media(max-width:1500px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:1150px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:850px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}body.tv-display-mode main#conteudo.tv-fullscreen{padding:12px 14px 76px}}
-@media(max-width:560px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:minmax(0,1fr)}body.tv-display-mode #painelGrid.tv-card-wall .pedido-card{min-height:0;padding:12px 13px;gap:7px}body.tv-display-mode #painelGrid.tv-card-wall .pc-cad{font-size:18px}body.tv-display-mode #painelGrid.tv-card-wall .pc-info{font-size:11px}body.tv-display-mode #painelGrid.tv-card-wall .pc-line b{font-size:11px}body.tv-display-mode #painelGrid.tv-card-wall .pc-schedule-item b{font-size:12px}body.tv-display-mode .tv-exit-button{right:12px;bottom:12px;padding:10px 14px;font-size:12px}}
+@media(max-width:1500px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1150px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+@media(max-width:850px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:minmax(0,1fr);gap:12px}body.tv-display-mode main#conteudo.tv-fullscreen{padding:12px 14px 76px}}
+@media(max-width:560px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:minmax(0,1fr)}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card{min-height:300px!important;padding:16px 17px!important;gap:11px!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-cad b{font-size:19px!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-client b{font-size:16px!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>span{font-size:15px!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>b{font-size:16px!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item b{font-size:16px!important}body.tv-display-mode .tv-exit-button{right:12px;bottom:12px;padding:10px 14px;font-size:12px}}
 /* Dashboard analítico — visual moderno e responsivo */
 .dashboard-page{max-width:1600px;margin:0 auto;padding:4px 2px 40px;color:#14253d}
 .dash-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:24px 26px;margin-bottom:16px;border-radius:20px;background:radial-gradient(circle at 88% 14%,rgba(93,181,255,.25),transparent 29%),linear-gradient(120deg,#101b49 0%,#173c78 58%,#126b8d 100%);color:#fff;box-shadow:0 14px 34px rgba(23,49,99,.19);position:relative;overflow:hidden}
@@ -843,6 +850,31 @@ body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:hover{box-shadow:0 2p
 .mot-driver-page .mot-driver-panel-card{flex:0 0 220px!important;width:min(100%,390px)!important;min-width:0!important;max-width:390px!important;min-height:220px!important;height:220px!important;max-height:220px!important;grid-column:auto!important;grid-row:auto!important;margin:0!important}
 .mot-driver-page .mot-driver-panel-card:hover,.mot-driver-page .mot-driver-panel-card:active{transform:none!important}
 @media(max-width:560px){.tv-shared-card{height:220px!important;min-height:220px!important;max-height:220px!important}.mot-driver-page .mot-dia-cards{align-items:stretch!important}.mot-driver-page .mot-driver-panel-card{width:100%!important;max-width:none!important}}
+
+
+/* Painel TV — Modelo 3: faixa de status e rodapé de horário, com textos maiores */
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:340px!important;height:auto!important;max-height:none!important;padding:0!important;gap:0!important;overflow:hidden!important;border:1px solid #d4dfeb!important;border-radius:14px!important;background:#f7faff!important;color:#17324d!important;box-shadow:0 4px 14px rgba(0,0,0,.22)!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:50px!important;margin:0!important;padding:9px 14px!important;border-radius:13px 13px 0 0!important;background:#215b3c!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.programado .pc-top{background:#215b3c!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.emrota .pc-top{background:#91400f!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.entregue .pc-top{background:#204e8a!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-numero{color:#fff!important;font-size:16px!important;line-height:1.2!important;font-weight:900!important;letter-spacing:0!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:34px!important;padding:6px 11px!important;border:1px solid #fff!important;border-radius:999px!important;background:#fff!important;color:#215b3c!important;font-size:14px!important;line-height:1.15!important;font-weight:950!important;letter-spacing:0!important;white-space:nowrap!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.emrota .pc-status{color:#91400f!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.entregue .pc-status{color:#204e8a!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status svg{display:inline-block!important;width:19px!important;height:19px!important;flex:0 0 19px!important;vertical-align:middle!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity{display:grid!important;grid-template-columns:minmax(100px,.62fr) minmax(0,1.7fr)!important;align-items:center!important;gap:12px!important;min-height:72px!important;margin:11px 13px 2px!important;padding:8px 11px!important;border:1px solid #cfdae5!important;border-radius:10px!important;background:#fff!important;overflow:visible!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity small{display:block!important;font-size:11px!important;line-height:1.2!important;letter-spacing:.4px!important;color:#536c84!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-cad b{display:block!important;font-size:25px!important;line-height:1.1!important;font-weight:950!important;color:#15599b!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-client b{display:block!important;font-size:17px!important;line-height:1.2!important;font-weight:900!important;color:#1e3d5b!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important;-webkit-line-clamp:unset!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;flex:1 0 auto!important;min-height:0!important;gap:7px 13px!important;padding:9px 15px 12px!important;overflow:visible!important;font-size:14px!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:3px!important;min-width:0!important;min-height:31px!important;padding:0 0 5px!important;border-bottom:1px solid #e2e9f1!important;line-height:1.2!important;font-size:14px!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>span{display:block!important;font-size:11px!important;line-height:1.2!important;font-weight:900!important;letter-spacing:.25px!important;text-transform:uppercase!important;color:#647c92!important;white-space:normal!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>b{display:block!important;min-width:0!important;font-size:14px!important;line-height:1.25!important;font-weight:800!important;text-align:left!important;color:#2c465f!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule{display:grid!important;grid-template-columns:1.1fr 1fr!important;flex:0 0 auto!important;min-height:64px!important;height:auto!important;align-items:center!important;gap:10px!important;margin:0 13px 13px!important;padding:9px 11px!important;border:1px solid #cfdae5!important;border-radius:10px!important;background:#edf4fb!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:3px!important;min-width:0!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item span{font-size:11px!important;line-height:1.2!important;font-weight:900!important;color:#536c84!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item b{font-size:17px!important;line-height:1.2!important;font-weight:950!important;color:#174574!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
 
 </style>
 </head>
@@ -1254,7 +1286,7 @@ function montarMenu(){
     abas=[['motorista',user.nome],['agenda','Agenda']];
     if(podeAcessarAbastecimento())abas.push(['abastecimento','Abastecimento']);
   }else{
-    abas=ABAS_ALL.filter(function(a){return (a[0]!=='abastecimento'||podeAcessarAbastecimento())&&(a[0]!=='monitoramento'||user.role==='Gestor')&&(a[0]!=='dashboard'||podeAcessarDashboard());});
+    abas=ABAS_ALL.filter(function(a){return (a[0]!=='abastecimento'||podeAcessarAbastecimento())&&(a[0]!=='monitoramento'||podeAcessarMonitoramento())&&(a[0]!=='dashboard'||podeAcessarDashboard());});
   }
   var html='';
   for(var i=0;i<abas.length;i++){
@@ -1276,7 +1308,7 @@ function navSub(sub){
   var fns={programacao:renderProgramacao,dashboard:renderDashboard,agenda:renderAgenda,painel:renderPainel,motorista:renderMotorista,clientes:renderClientes,abastecimento:renderAbastecimento,monitoramento:renderMonitoramento};
   if(sub==='dashboard'&&!podeAcessarDashboard()){toast('Acesso ao dashboard restrito ao gestor e ao Robson.','error');navSub('programacao');return;}
   if(sub==='abastecimento'&&!podeAcessarAbastecimento()){toast('Seu perfil não tem acesso a este módulo','error');navSub(user.role==='Motorista'?'motorista':'programacao');return;}
-  if(sub==='monitoramento'&&(!user||user.role!=='Gestor')){toast('Somente o gestor pode acompanhar as posições','error');navSub('programacao');return;}
+  if(sub==='monitoramento'&&!podeAcessarMonitoramento()){toast('Seu perfil não tem acesso ao Monitoramento','error');navSub('programacao');return;}
   (fns[sub]||function(){})();
 }
 
@@ -1659,6 +1691,7 @@ var dashboardFiltros=null;
 var DASHBOARD_MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 var DASHBOARD_CORES=['#21D8E4','#C8F23A','#62A9FF','#F4A340','#9A82FF','#F16FAD','#42D7A2','#FF6B6B'];
 function podeAcessarDashboard(){var uid=String(user&&user.uid||''),email=String(user&&user.email||'').trim().toLowerCase();return uid==='VDQjPErT6hSQXtvagoJPC5fBHEh1'||uid==='dLehq8OWwxgwdgzfXLwEL5Tcdsj2'||email==='joel.m.santos407@gmail.com'||email==='robson.takara@randstad.com.br';}
+function podeAcessarMonitoramento(){var uid=String(user&&user.uid||''),login=String(user&&(user.user||user.email)||'').trim().toLowerCase();return !!user&&(user.role==='Gestor'||(user.role==='Analista'&&(uid==='dLehq8OWwxgwdgzfXLwEL5Tcdsj2'||login==='robson.takara@randstad.com.br')));}
 function dashData(p){var ms=chaveDataEntregaOrdenacao(p&&p.dataEntrega);if(!ms)return null;var d=new Date(ms);return{ano:d.getUTCFullYear(),mes:d.getUTCMonth()+1};}
 function dashOperacao(p){var original=String(p&&p.tipo||'').trim(),n=normalizarCabecalho(original),entrega=n.indexOf('entrega')>=0,retirada=n.indexOf('coleta')>=0||n.indexOf('retira')>=0,key=entrega&&retirada?'Coleta e Entrega':retirada?'Coleta':entrega?'Entrega':(original||'Não informado');return{key:key,entrega:entrega,retirada:retirada,label:key==='Coleta'?'Retirada (Coleta)':key==='Coleta e Entrega'?'Entrega + retirada':key};}
 function dashConcluida(p){return normalizarCabecalho(p&&p.status)==='entregue';}
@@ -1777,21 +1810,26 @@ function renderDashboard(){
 /* ============ MONITORAMENTO LOCAL DE MOTORISTAS ============ */
 var MONITOR_CORES=['#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#db2777','#ca8a04','#dc2626'];
 function placaMonitoramento(p){
-  if(p&&p.placa)return String(p.placa).trim();var nome=normalizarCabecalho(p&&p.carro||'');
-  for(var i=0;i<veiculosAbastecimento.length;i++){var v=veiculosAbastecimento[i];if(normalizarCabecalho(v.nome||'')===nome&&v.placa)return String(v.placa).trim();}
-  for(var j=0;j<abastecimentos.length;j++){var a=abastecimentos[j];if(normalizarCabecalho(a.veiculo||'')===nome&&a.placa)return String(a.placa).trim();}
-  for(var k=0;k<CARROS.length;k++){var c=CARROS[k];if(normalizarCabecalho(c.nome||'')===nome&&c.placa)return String(c.placa).trim();}
+  if(!p)return 'Placa não cadastrada';var invalida=normalizarCabecalho('Placa não cadastrada');
+  function placaValida(valor){var texto=String(valor||'').trim();return texto&&normalizarCabecalho(texto)!==invalida?texto:'';}
+  var direta=placaValida(p.placa);if(direta)return direta;
+  var loc=p.localizacaoAtual||{},placaLoc=placaValida(loc.placa);if(placaLoc)return placaLoc;
+  var nomes=[p.carro,p.veiculo,loc.veiculo].map(function(x){return normalizarCabecalho(x||'');}).filter(Boolean);
+  for(var i=0;i<veiculosAbastecimento.length;i++){var v=veiculosAbastecimento[i];if(nomes.indexOf(normalizarCabecalho(v.nome||''))>=0){var pv=placaValida(v.placa);if(pv)return pv;}}
+  for(var j=0;j<abastecimentos.length;j++){var a=abastecimentos[j];if(nomes.indexOf(normalizarCabecalho(a.veiculo||''))>=0){var pa=placaValida(a.placa);if(pa)return pa;}}
+  for(var k=0;k<CARROS.length;k++){var c=CARROS[k];if(nomes.indexOf(normalizarCabecalho(c.nome||''))>=0){var pc=placaValida(c.placa);if(pc)return pc;}}
+  var motorista=normalizarCabecalho(p.motorista||loc.motorista||'');if(motorista){var candidatos=CARROS.filter(function(c){return normalizarCabecalho(c.motorista||'')===motorista&&placaValida(c.placa);});if(candidatos.length===1)return placaValida(candidatos[0].placa);}
   return 'Placa não cadastrada';
 }
 function chaveVeiculoMonitoramento(p){var placa=placaMonitoramento(p);return normalizarCabecalho(placa==='Placa não cadastrada'?(p&&p.carro||'Veículo'):placa)||normalizarCabecalho(p&&p.carro||'Veículo');}
 function corVeiculoMonitoramento(p){var keys=[];programacoes.forEach(function(x){var k=chaveVeiculoMonitoramento(x);if(k&&keys.indexOf(k)<0)keys.push(k);});veiculosAbastecimento.forEach(function(x){var k=normalizarCabecalho(x.placa||x.nome||'');if(k&&keys.indexOf(k)<0)keys.push(k);});keys.sort();var idx=keys.indexOf(chaveVeiculoMonitoramento(p));return MONITOR_CORES[(idx<0?0:idx)%MONITOR_CORES.length];}
 function textoTempoPosicao(iso){if(!iso)return 'sem posição';var ms=Date.now()-Date.parse(iso);if(!isFinite(ms))return 'data inválida';var min=Math.max(0,Math.floor(ms/60000));if(min<1)return 'agora';if(min<60)return 'há '+min+' min';var h=Math.floor(min/60);return 'há '+h+' h '+(min%60)+' min';}
 function renderMonitoramento(){
-  if(!user||user.role!=='Gestor'){toast('Somente o gestor pode acompanhar as posições','error');return;}
+  if(!podeAcessarMonitoramento()){toast('Seu perfil não tem acesso ao Monitoramento','error');return;}
   if(monitorMap){monitorMap.remove();monitorMap=null;}monitorMarkers={};monitorMapFitted=false;monitorMarkerSignature='';
   var conteudo=document.getElementById('conteudo');if(!conteudo)return;
   conteudo.innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' Monitoramento de Motoristas</h1><p>Última posição recebida dos veículos com entrega em rota.</p></div>'
-    +'<div class="info-box info"><div><b>Monitoramento sincronizado:</b> o motorista autoriza o GPS no celular ao iniciar; a posição é compartilhada com o gestor a cada 10 minutos e apagada ao finalizar. O mapa exibe somente a última posição, não o trajeto.</div></div>'
+    +'<div class="info-box info"><div><b>Monitoramento sincronizado:</b> o motorista autoriza o GPS no celular ao iniciar; a posição é compartilhada com o gestor e com o Robson a cada 5 minutos e apagada ao finalizar. O mapa exibe somente a última posição, não o trajeto.</div></div>'
     +'<div class="card monitor-card"><div class="monitor-map-head"><div><h2>Mapa dos veículos</h2><div class="sub">As cores identificam os veículos; toque no marcador para ver motorista e entrega.</div></div><button class="btn ghost sm" onclick="atualizarMapaMonitoramento(true)">Atualizar</button></div><div id="monitorMapa" aria-label="Mapa com localização dos veículos"></div><div id="monitorMapError" class="empty" style="display:none">O mapa não carregou. Confira a conexão com a internet e tente novamente.</div><div class="monitor-atrib">Mapa © OpenStreetMap contributors</div></div>'
     +'<div class="card"><h2>Entregas em rota</h2><div id="monitorLista"></div></div>';
   setTimeout(function(){inicializarMapaMonitoramento();atualizarMapaMonitoramento(false);},100);
@@ -1802,7 +1840,7 @@ function inicializarMapaMonitoramento(){
   try{monitorMap=L.map(el,{scrollWheelZoom:true}).setView([-23.55,-46.63],10);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(monitorMap);setTimeout(function(){if(monitorMap)monitorMap.invalidateSize();},150);}catch(e){var er=document.getElementById('monitorMapError');if(er)er.style.display='block';}
 }
 function atualizarMapaMonitoramento(manual){
-  if(!user||user.role!=='Gestor'){if(manual)toast('Somente o gestor pode acompanhar as posições','error');return;}
+  if(!podeAcessarMonitoramento()){if(manual)toast('Seu perfil não tem acesso ao Monitoramento','error');return;}
   if(!monitorMap){if(typeof L!=='undefined'&&document.getElementById('monitorMapa'))inicializarMapaMonitoramento();if(!monitorMap)return;}
   var listaEl=document.getElementById('monitorLista');if(!listaEl)return;
   var ativos=programacoes.filter(function(p){return p.status==='Em Rota';}).sort(function(a,b){return String(a.motorista||'').localeCompare(String(b.motorista||''));});
@@ -1823,9 +1861,9 @@ function capturarPosicaoEntrega(num,callbackErro,callbackOk){
   if(!navigator.geolocation){if(callbackErro)callbackErro('Este navegador não oferece localização GPS.');return;}
   navigator.geolocation.getCurrentPosition(function(pos){var ok=gravarPosicaoLocal(num,pos);if(callbackOk)callbackOk(ok,pos);},function(err){var msg=err&&err.code===1?'Permissão de localização negada. Libere a localização nas configurações do navegador.':'Não consegui obter o GPS. Confira a localização do celular e tente novamente.';if(callbackErro)callbackErro(msg);},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
-function iniciarAtualizacoesLocalizacao(num){if(rastreadoresMotorista[num])return;rastreadoresMotorista[num]=setInterval(function(){var p=encontrarProgPorNumero(num);if(!p||p.status!=='Em Rota'){pararAtualizacoesLocalizacao(num);return;}capturarPosicaoEntrega(num,null);},600000);}
+function iniciarAtualizacoesLocalizacao(num){if(rastreadoresMotorista[num])return;rastreadoresMotorista[num]=setInterval(function(){var p=encontrarProgPorNumero(num);if(!p||p.status!=='Em Rota'){pararAtualizacoesLocalizacao(num);return;}capturarPosicaoEntrega(num,null);},300000);}
 function pararAtualizacoesLocalizacao(num){if(rastreadoresMotorista[num]){clearInterval(rastreadoresMotorista[num]);delete rastreadoresMotorista[num];}}
-function motRetomarRastreamento(num){var p=encontrarProgPorNumero(num);if(!user||user.role!=='Motorista'||!p||p.motorista!==user.nome||p.status!=='Em Rota'){toast('Somente o motorista designado pode retomar o envio da localização','error');return;}if(!confirm('Retomar o envio da sua localização a cada 10 minutos até finalizar esta entrega?'))return;capturarPosicaoEntrega(num,function(msg){toast(msg,'error');},function(ok){if(!ok)return;iniciarAtualizacoesLocalizacao(num);toast('Atualização de localização retomada');});}
+function motRetomarRastreamento(num){var p=encontrarProgPorNumero(num);if(!user||user.role!=='Motorista'||!p||p.motorista!==user.nome||p.status!=='Em Rota'){toast('Somente o motorista designado pode retomar o envio da localização','error');return;}if(!confirm('Retomar o envio da sua localização a cada 5 minutos até finalizar esta entrega?'))return;capturarPosicaoEntrega(num,function(msg){toast(msg,'error');},function(ok){if(!ok)return;iniciarAtualizacoesLocalizacao(num);toast('Atualização de localização retomada');});}
 
 /* ============ MÓDULO MOTORISTA ============ */
 function motDiaHojeStr(){var h=new Date();return h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0')+'-'+String(h.getDate()).padStart(2,'0');}
@@ -1954,7 +1992,7 @@ function prepararFotoLocal(file,callback){
 }
 function motIniciarModal(num){
   var p=encontrarProgPorNumero(num);if(!p)return;if(!user||user.role!=='Motorista'||p.motorista!==user.nome){toast('Somente o motorista designado pode iniciar esta entrega','error');return;}if(p.status!=='Programado'){toast('Esta entrega não está aguardando início','error');return;}if(!navigator.geolocation){toast('Este navegador não permite acessar a localização','error');return;}if(window.isSecureContext===false){toast('Abra o aplicativo pelo link seguro HTTPS para usar a localização','error');return;}if(iniciosGPSPendentes[num])return;
-  if(!confirm('Para iniciar, permita o acesso à localização do celular quando o navegador solicitar. A posição será atualizada a cada 10 minutos até Finalizar Entrega. Continuar?'))return;
+  if(!confirm('Para iniciar, permita o acesso à localização do celular quando o navegador solicitar. A posição será atualizada a cada 5 minutos até Finalizar Entrega. Continuar?'))return;
   iniciosGPSPendentes[num]=true;toast('Aguardando a permissão e a primeira posição do GPS…','info');
   navigator.geolocation.getCurrentPosition(function(pos){delete iniciosGPSPendentes[num];var atual=encontrarProgPorNumero(num);if(!atual||atual.status!=='Programado')return;var inicioReal=new Date();atual.status='Em Rota';atual.horaInicio=inicioReal.toLocaleString('pt-BR');atual.inicioRealISO=inicioReal.toISOString();atual.fimRealISO=null;atual.duracaoEntregaMinutos=null;atual.localizacaoAtual=null;if(!atual.lidoPor)atual.lidoPor=[];if(atual.lidoPor.indexOf(user.nome)<0)atual.lidoPor.push(user.nome);gravarPosicaoLocal(num,pos);iniciarAtualizacoesLocalizacao(num);atualizarSino();toast('Entrega iniciada; localização compartilhada neste aparelho');abrirModalMot(num);renderMotorista();},function(err){delete iniciosGPSPendentes[num];var msg=err&&err.code===1?'A entrega não foi iniciada. Permita a localização nas configurações do navegador e tente novamente.':'A entrega não foi iniciada porque não consegui obter uma posição GPS. Confira o sinal e tente novamente.';toast(msg,'error');},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
@@ -2388,7 +2426,7 @@ function itemData(collectionName, item) {
   if (collectionName === 'motoristasAbastecimento') return { nome: String(item) };
   const data = cleanData(item);
   if (collectionName === 'programacoes') {
-    // GPS is stored separately so only managers can read locations.
+    // GPS is stored separately; only the manager and Robson's approved account can read locations.
     delete data.localizacaoAtual;
     // Proof photos remain local for now; Firestore documents have a 1 MiB limit.
     delete data.fotos;
@@ -2418,9 +2456,12 @@ function stable(value) {
   return JSON.stringify(value);
 }
 function equal(a, b) { return stable(a) === stable(b); }
+function canMonitorProfile(profile) {
+  return !!profile && (profile.role === 'Gestor' || (profile.role === 'Analista' && String(profile.login || '').trim().toLowerCase() === 'robson.takara@randstad.com.br'));
+}
 function readCollections(profile) {
   if (profile.role === 'Gestor') return allCollections.slice();
-  if (profile.role === 'Analista') return ['programacoes','clientes','regioes'];
+  if (profile.role === 'Analista') { const names = ['programacoes','clientes','regioes']; if (canMonitorProfile(profile)) names.push('rastreamento'); return names; }
   if (profile.role === 'Motorista') return ['programacoes'];
   return [];
 }
@@ -2434,7 +2475,7 @@ function applyTrackingToPrograms() {
   remote.programacoes = (remote.programacoes || []).map((p) => {
     const item = Object.assign({}, p);
     const loc = currentTracking.get(String(item.numero));
-    if (activeProfile && activeProfile.role === 'Gestor' && loc) item.localizacaoAtual = Object.assign({}, loc);
+    if (canMonitorProfile(activeProfile) && loc) item.localizacaoAtual = Object.assign({}, loc);
     else delete item.localizacaoAtual;
     return item;
   });
@@ -2664,10 +2705,8 @@ async function startSync(profile) {
     sub('veiculosAbastecimento', collection(db, 'veiculosAbastecimento'));
     sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'));
   }
-  if (profile.role === 'Gestor') {
-    sub('abastecimentos', collection(db, 'abastecimentos'));
-    sub('rastreamento', collection(db, 'rastreamento'));
-  }
+  if (profile.role === 'Gestor') sub('abastecimentos', collection(db, 'abastecimentos'));
+  if (canMonitorProfile(profile)) sub('rastreamento', collection(db, 'rastreamento'));
   if (!required.length) throw new Error('Nenhuma coleção autorizada para este perfil.');
   let timeoutId;
   try {
