@@ -852,29 +852,49 @@ body.tv-display-mode #painelGrid.tv-card-wall .pedido-card:hover{box-shadow:0 2p
 @media(max-width:560px){.tv-shared-card{height:220px!important;min-height:220px!important;max-height:220px!important}.mot-driver-page .mot-dia-cards{align-items:stretch!important}.mot-driver-page .mot-driver-panel-card{width:100%!important;max-width:none!important}}
 
 
-/* Painel TV — Modelo 3: faixa de status e rodapé de horário, com textos maiores */
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:340px!important;height:auto!important;max-height:none!important;padding:0!important;gap:0!important;overflow:hidden!important;border:1px solid #d4dfeb!important;border-radius:14px!important;background:#f7faff!important;color:#17324d!important;box-shadow:0 4px 14px rgba(0,0,0,.22)!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:50px!important;margin:0!important;padding:9px 14px!important;border-radius:13px 13px 0 0!important;background:#215b3c!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.programado .pc-top{background:#215b3c!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.emrota .pc-top{background:#91400f!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.entregue .pc-top{background:#204e8a!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-numero{color:#fff!important;font-size:16px!important;line-height:1.2!important;font-weight:900!important;letter-spacing:0!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:34px!important;padding:6px 11px!important;border:1px solid #fff!important;border-radius:999px!important;background:#fff!important;color:#215b3c!important;font-size:14px!important;line-height:1.15!important;font-weight:950!important;letter-spacing:0!important;white-space:nowrap!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.emrota .pc-status{color:#91400f!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.entregue .pc-status{color:#204e8a!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status svg{display:inline-block!important;width:19px!important;height:19px!important;flex:0 0 19px!important;vertical-align:middle!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity{display:grid!important;grid-template-columns:minmax(100px,.62fr) minmax(0,1.7fr)!important;align-items:center!important;gap:12px!important;min-height:72px!important;margin:11px 13px 2px!important;padding:8px 11px!important;border:1px solid #cfdae5!important;border-radius:10px!important;background:#fff!important;overflow:visible!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity small{display:block!important;font-size:11px!important;line-height:1.2!important;letter-spacing:.4px!important;color:#536c84!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-cad b{display:block!important;font-size:25px!important;line-height:1.1!important;font-weight:950!important;color:#15599b!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-client b{display:block!important;font-size:17px!important;line-height:1.2!important;font-weight:900!important;color:#1e3d5b!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important;-webkit-line-clamp:unset!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;flex:1 0 auto!important;min-height:0!important;gap:7px 13px!important;padding:9px 15px 12px!important;overflow:visible!important;font-size:14px!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:3px!important;min-width:0!important;min-height:31px!important;padding:0 0 5px!important;border-bottom:1px solid #e2e9f1!important;line-height:1.2!important;font-size:14px!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>span{display:block!important;font-size:11px!important;line-height:1.2!important;font-weight:900!important;letter-spacing:.25px!important;text-transform:uppercase!important;color:#647c92!important;white-space:normal!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>b{display:block!important;min-width:0!important;font-size:14px!important;line-height:1.25!important;font-weight:800!important;text-align:left!important;color:#2c465f!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule{display:grid!important;grid-template-columns:1.1fr 1fr!important;flex:0 0 auto!important;min-height:64px!important;height:auto!important;align-items:center!important;gap:10px!important;margin:0 13px 13px!important;padding:9px 11px!important;border:1px solid #cfdae5!important;border-radius:10px!important;background:#edf4fb!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:3px!important;min-width:0!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item span{font-size:11px!important;line-height:1.2!important;font-weight:900!important;color:#536c84!important}
-body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item b{font-size:17px!important;line-height:1.2!important;font-weight:950!important;color:#174574!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
+/* Acesso e sincronização: estado persistente e controles de nova tentativa */
+.sync-indicator{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #bfd2e3;border-radius:999px;background:#eff8f2;color:#174b34;font-size:12px;font-weight:850;white-space:nowrap}
+.sync-indicator .sync-dot{width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#28a765;box-shadow:0 0 0 3px rgba(40,167,101,.16)}
+.sync-indicator[data-state="syncing"]{background:#fff8e9;color:#81520f;border-color:#ead39d}.sync-indicator[data-state="syncing"] .sync-dot{background:#e4a426;box-shadow:0 0 0 3px rgba(228,164,38,.18)}
+.sync-indicator[data-state="offline"]{background:#fff0ef;color:#9b2c28;border-color:#edc4c1}.sync-indicator[data-state="offline"] .sync-dot{background:#d74640;box-shadow:0 0 0 3px rgba(215,70,64,.16)}
+#toast.show{pointer-events:auto}.toast-retry{margin-left:6px;padding:7px 10px;border:1px solid rgba(255,255,255,.72);border-radius:8px;background:rgba(255,255,255,.16);color:#fff;font-size:12px;font-weight:850;white-space:nowrap;cursor:pointer}
+/* Tela inicial aprovada: ação Nova Programação em verde-limão */
+#conteudo.prog-wide .prog-home-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+#conteudo.prog-wide .prog-home-head>div{min-width:0}
+#conteudo.prog-wide .prog-home-new{min-height:52px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:2px solid #eaff9d!important;border-radius:12px!important;background:linear-gradient(135deg,#dcff58,#b9e832)!important;color:#101c3c!important;font-size:16px!important;font-weight:950!important;white-space:nowrap;box-shadow:0 3px 0 #91ad20,0 8px 18px rgba(8,10,50,.18)!important;cursor:pointer}
+#conteudo.prog-wide .prog-home-new:hover{transform:none!important;filter:brightness(1.02)}
+#conteudo.prog-wide .prog-home-plus{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#13234b;color:#d8ff58;font-size:24px;font-weight:700;line-height:1}
+#conteudo.prog-wide #acc-novaProg>.acc-head{display:none!important}
+@media(max-width:760px){#conteudo.prog-wide .prog-home-head{align-items:stretch;flex-direction:column}#conteudo.prog-wide .prog-home-new{width:100%}}
+/* Painel TV — Modelo 3 compacto: status em faixa e horário no rodapé, seis cards */
+body.tv-display-mode main#conteudo.tv-fullscreen{padding:10px 16px 62px!important;overflow-x:hidden!important;overflow-y:auto!important}
+body.tv-display-mode #painelGrid.tv-card-wall{width:min(100%,1900px)!important;max-width:1900px!important;height:auto!important;min-height:0!important;margin:0 auto!important;padding:0 0 8px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-rows:minmax(300px,auto)!important;gap:12px!important;align-content:start!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card{display:flex!important;flex-direction:column!important;min-width:0!important;width:100%!important;height:300px!important;min-height:300px!important;max-height:300px!important;padding:0!important;gap:0!important;overflow:hidden!important;border:1px solid #cbd7e4!important;border-radius:13px!important;background:#f8fbff!important;color:#172b43!important;box-shadow:0 3px 8px rgba(0,0,0,.22)!important;transform:none!important;filter:none!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card:hover{transform:none!important;box-shadow:0 3px 8px rgba(0,0,0,.22)!important;filter:none!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-top{display:flex!important;flex:0 0 40px!important;min-height:40px!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:0!important;padding:6px 10px!important;border-radius:12px 12px 0 0!important;background:#215b3c!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.programado .pc-top{background:#215b3c!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.emrota .pc-top{background:#91400f!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.entregue .pc-top{background:#204e8a!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-numero{color:#fff!important;font-size:14px!important;line-height:1.15!important;font-weight:900!important;letter-spacing:0!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-height:27px!important;padding:4px 8px!important;border:1px solid #fff!important;border-radius:999px!important;background:#fff!important;color:#215b3c!important;font-size:12px!important;line-height:1.1!important;font-weight:950!important;white-space:nowrap!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.emrota .pc-status{color:#91400f!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card.entregue .pc-status{color:#204e8a!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-status svg{display:inline-block!important;width:16px!important;height:16px!important;flex:0 0 16px!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity{display:grid!important;grid-template-columns:minmax(80px,.58fr) minmax(0,1.7fr)!important;align-items:center!important;gap:8px!important;flex:0 0 auto!important;min-height:53px!important;margin:7px 9px 1px!important;padding:5px 8px!important;border:1px solid #d2dce6!important;border-radius:8px!important;background:#fff!important;overflow:hidden!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity small{display:block!important;font-size:9px!important;line-height:1.1!important;letter-spacing:.25px!important;color:#566f87!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-cad b{display:block!important;font-size:20px!important;line-height:1.05!important;font-weight:950!important;color:#15599b!important;white-space:normal!important;overflow-wrap:anywhere!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-identity-client b{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;font-size:14px!important;line-height:1.12!important;font-weight:900!important;color:#1e3d5b!important;overflow-wrap:anywhere!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;flex:1 1 auto!important;min-height:0!important;align-content:center!important;gap:3px 9px!important;padding:5px 10px 7px!important;overflow:hidden!important;font-size:12px!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:2px!important;min-width:0!important;min-height:27px!important;padding:0 0 3px!important;border-bottom:1px solid #e3eaf1!important;line-height:1.12!important;font-size:12px!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>span{display:block!important;font-size:9px!important;line-height:1.1!important;font-weight:900!important;letter-spacing:.2px!important;text-transform:uppercase!important;color:#647c92!important;white-space:normal!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .tv-shared-info .pc-line>b{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;min-width:0!important;font-size:12px!important;line-height:1.15!important;font-weight:800!important;text-align:left!important;color:#2c465f!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:anywhere!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule{display:grid!important;grid-template-columns:1.1fr 1fr!important;flex:0 0 49px!important;min-height:49px!important;height:49px!important;align-items:center!important;gap:8px!important;margin:0 9px 8px!important;padding:5px 8px!important;border:1px solid #cbd9e6!important;border-radius:8px!important;background:#edf4fb!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;min-width:0!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item span{font-size:9px!important;line-height:1.1!important;font-weight:900!important;color:#536c84!important}
+body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item b{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;font-size:14px!important;line-height:1.12!important;font-weight:950!important;color:#174574!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:anywhere!important}
+@media(max-width:1150px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(300px,auto)!important}}
+@media(max-width:760px){body.tv-display-mode #painelGrid.tv-card-wall{grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:300px!important}}
+@media(max-width:560px){body.tv-display-mode main#conteudo.tv-fullscreen{padding:10px 10px 60px!important}body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card{height:300px!important;min-height:300px!important;max-height:300px!important}}
+@media(max-width:640px){.sync-indicator{gap:4px;padding:5px 7px;font-size:10px}.sync-indicator .sync-dot{width:8px;height:8px;flex-basis:8px}}
+
+.splash-ready-dot{display:inline-block;width:15px;height:15px;margin-right:8px;vertical-align:1px;border-radius:50%;background:#33c17d;box-shadow:0 0 0 4px rgba(51,193,125,.18)}
 
 </style>
 </head>
@@ -902,7 +922,7 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
 <div id="splash">
   <div class="stars" id="stars"></div>
   <div class="rocket-wrap"><svg class="rocket-icon xl" viewBox="0 0 120 120"><use href="#rocket-svg"/></svg></div>
-  <div class="frase">Bem-vindo à Programação<span>Randstad</span></div>
+  <div class="frase"><i id="splashReadyDot" class="splash-ready-dot" style="display:none" aria-hidden="true"></i><b id="splashTitle">Entrando...</b><span id="splashSubMessage">Verificando se sua sessão está ativa.</span></div>
   <div class="bar"><i></i></div>
 </div>
 
@@ -918,6 +938,7 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
       <h2>Acessar sistema</h2>
       <div class="desc">Informe suas credenciais para continuar.</div>
       <div id="loginErro" class="erro"></div>
+      <button type="button" id="loginRetry" class="btn ghost full" style="display:none;margin:8px 0" onclick="reintentarEntrada()">Tentar novamente</button>
       <div class="field"><label>E-mail</label><input id="loginUser" class="input" type="email" placeholder="seu e-mail cadastrado" autocomplete="username"></div>
       <div class="field"><label>Senha</label><input id="loginPass" class="input" type="password" placeholder="Sua senha" autocomplete="current-password"></div>
       <button class="btn full" onclick="fazerLogin()">Entrar</button>
@@ -932,6 +953,7 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
     <div class="title" id="topoTitulo">Programação Randstad<small id="topoSubtitulo">Programação de Entregas</small></div>
   </div>
   <div class="topbar-right">
+    <div id="syncIndicator" class="sync-indicator" data-state="syncing" role="status" aria-live="polite"><span class="sync-dot"></span><span id="syncLabel">Sincronizando</span></div>
     <div id="sinoWrap"></div>
     <button class="global-theme-toggle" id="globalThemeToggle" onclick="alternarTemaSistema()" title="Alternar tema" aria-label="Alternar tema"><span id="themeModeIcon">☾</span><span id="themeModeLabel">Escuro</span></button>
     <div class="user"><div class="avatar" id="avatar"></div><span class="uname" id="nomeUsuario"></span></div>
@@ -943,7 +965,7 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
 <main class="hidden" id="conteudo"></main>
 <footer class="credits hidden" id="credits">Desenvolvido por <b>EuSou Tecnologia</b></footer>
 
-<div id="toast"><div class="toast-inner"><div class="ic">✓</div><span id="toastMsg">Sucesso</span></div></div>
+<div id="toast"><div class="toast-inner"><div class="ic">✓</div><span id="toastMsg">Sucesso</span><button type="button" id="toastRetry" class="toast-retry" style="display:none" onclick="retryPendingSync()">Tentar novamente</button></div></div>
 
 <!-- Modal Detalhes da Programação -->
 <div class="modal-overlay" id="modalProgDet"><div class="modal"><h3 id="modalProgDetTitulo">Detalhes da Programação</h3><div id="modalProgDetBody"></div><div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" onclick="fecharModalProgDet()">Fechar</button><button class="btn warn" id="btnEditarProg" onclick="editarProgAtual()">✏️ Editar</button></div></div></div>
@@ -1091,15 +1113,27 @@ function statusComHora(p){
   if(p.horaFim)html+='<div style="font-size:11.5px;color:#1e40af;font-weight:700;margin-top:3px">Fim: '+esc(p.horaFim)+'</div>';
   return html;
 }
-function toast(msg,tipo){
+var _syncUiState='offline',_firebaseSaveSequence=0,_firebaseSaveToastCapture=0,_firebaseSaveToastPending=0,_firebaseSaveCaptureTimer=null,_firebaseRetryState=false;
+function atualizarIndicadorSincronizacao(estado){
+  _syncUiState=estado;
+  var wrap=document.getElementById('syncIndicator'),label=document.getElementById('syncLabel');
+  if(!wrap||!label)return;
+  var nomes={syncing:'Sincronizando',synced:'Sincronizado',offline:'Sem conexão'};
+  var titulos={syncing:'Aguardando confirmação do Firebase',synced:'Firebase confirmou a sincronização',offline:'A última operação não foi confirmada'};
+  wrap.setAttribute('data-state',estado);wrap.title=titulos[estado]||'';label.textContent=nomes[estado]||'Sem conexão';
+}
+function toast(msg,tipo,ignorarConfirmacao,mostrarRetry){
   tipo=tipo||'success';
+  if(tipo==='success'&&!ignorarConfirmacao&&sincronizacaoFirebaseAtiva&&_firebaseSaveToastCapture){
+    _firebaseSaveToastPending=_firebaseSaveToastCapture;_firebaseSaveToastCapture=0;toast('Salvando...','info',true,false);return;
+  }
   var el=document.getElementById('toast');if(!el)return;
   el.className='';document.getElementById('toastMsg').textContent=msg;el.classList.add('show');
   if(tipo==='error')el.classList.add('error');if(tipo==='info')el.classList.add('info');
   var ic=document.querySelector('#toast .ic');if(ic)ic.textContent=tipo==='error'?'!':tipo==='info'?'i':'✓';
-  clearTimeout(window._toastT);window._toastT=setTimeout(function(){el.classList.remove('show');},3200);
-}
-function toggleAcc(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+  var retry=document.getElementById('toastRetry');if(retry)retry.style.display=mostrarRetry?'inline-flex':'none';
+  clearTimeout(window._toastT);window._toastT=setTimeout(function(){el.classList.remove('show');if(retry)retry.style.display='none';},mostrarRetry?9000:3200);
+} function toggleAcc(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
 
 /* ============ PERSISTÊNCIA ============ */
 var DB_KEY='randstad_programacao_v1';
@@ -1108,7 +1142,48 @@ var sincronizacaoFirebaseAtiva=false;
 function estadoAtualDB(){return {programacoes:programacoes,clientes:clientes,regioes:regioes,abastecimentos:abastecimentos,veiculosAbastecimento:veiculosAbastecimento,motoristasAbastecimento:motoristasAbastecimento};}
 function chaveDBLocal(){return DB_KEY+(user&&user.uid?'_user_'+user.uid:'');}
 function salvarDBLocal(){try{localStorage.setItem(chaveDBLocal(),JSON.stringify(estadoAtualDB()));return true;}catch(e){return false;}}
-function saveDB(){var salvoLocal=salvarDBLocal();if(sincronizacaoFirebaseAtiva&&window.programFirebase&&user)window.programFirebase.syncState(estadoAtualDB());return salvoLocal;}
+function concluirGravacaoFirebase(seq,resultado){
+  if(seq!==_firebaseSaveSequence)return;
+  _firebaseRetryState=false;atualizarIndicadorSincronizacao('synced');
+  if(_firebaseSaveToastPending===seq){
+    _firebaseSaveToastPending=0;
+    if(resultado&&resultado.written===true)toast('Pronto! A movimentação foi gravada na base compartilhada.','success',true,false);
+    else toast('Nenhuma alteração nova foi gravada na base compartilhada.','info',true,false);
+  }
+}
+function falhaGravacaoFirebase(seq,err){
+  if(seq!==_firebaseSaveSequence)return;
+  _firebaseSaveToastCapture=0;_firebaseRetryState=true;atualizarIndicadorSincronizacao('offline');
+  console.error('Falha ao confirmar gravação no Firebase:',err);
+  if(_firebaseSaveToastPending===seq)toast('Não recebemos a confirmação da gravação. Verifique a conexão e tente novamente.','error',true,true);
+}
+function saveDB(){
+  var salvoLocal=salvarDBLocal();
+  if(sincronizacaoFirebaseAtiva&&window.programFirebase&&user){
+    var seq=++_firebaseSaveSequence;
+    if(_firebaseSaveToastPending)_firebaseSaveToastPending=seq;
+    _firebaseSaveToastCapture=seq;
+    if(_firebaseSaveCaptureTimer)clearTimeout(_firebaseSaveCaptureTimer);
+    _firebaseSaveCaptureTimer=setTimeout(function(){if(_firebaseSaveToastCapture===seq)_firebaseSaveToastCapture=0;},5000);
+    atualizarIndicadorSincronizacao('syncing');
+    try{
+      var p=window.programFirebase.syncState(estadoAtualDB());
+      if(!p||typeof p.then!=='function')throw new Error('A gravação não retornou uma confirmação do Firebase.');
+      p.then(function(resultado){concluirGravacaoFirebase(seq,resultado);}).catch(function(err){falhaGravacaoFirebase(seq,err);});
+    }catch(err){falhaGravacaoFirebase(seq,err);}
+  }
+  return salvoLocal;
+}
+function retryPendingSync(){
+  if(!sincronizacaoFirebaseAtiva||!window.programFirebase||!user)return;
+  var seq=++_firebaseSaveSequence;_firebaseSaveToastCapture=0;_firebaseSaveToastPending=seq;_firebaseRetryState=false;
+  atualizarIndicadorSincronizacao('syncing');
+  try{
+    var p=window.programFirebase.syncState(estadoAtualDB());
+    if(!p||typeof p.then!=='function')throw new Error('A gravação não retornou uma confirmação do Firebase.');
+    p.then(function(resultado){concluirGravacaoFirebase(seq,resultado);}).catch(function(err){falhaGravacaoFirebase(seq,err);});
+  }catch(err){falhaGravacaoFirebase(seq,err);}
+}
 function loadDB(chave){try{var raw=localStorage.getItem(chave||DB_KEY);if(raw){var d=JSON.parse(raw);programacoes=d.programacoes||[];clientes=d.clientes||[];regioes=d.regioes||REGIOES_DEFAULT.slice();abastecimentos=d.abastecimentos||[];veiculosAbastecimento=d.veiculosAbastecimento||[];motoristasAbastecimento=d.motoristasAbastecimento||['Joel','Robson','Alexandre','Roger','Fabio'];return true;}}catch(e){}return false;}
 function capturarDadosLegados(){try{var raw=localStorage.getItem(DB_KEY);if(!raw)return null;var d=JSON.parse(raw);return {programacoes:d.programacoes||[],clientes:d.clientes||[],regioes:d.regioes||[],abastecimentos:d.abastecimentos||[],veiculosAbastecimento:d.veiculosAbastecimento||[],motoristasAbastecimento:d.motoristasAbastecimento||[]};}catch(e){return null;}}
 var firebaseSnapshotRenderPendente=false;
@@ -1126,6 +1201,7 @@ function temCamposNaoSalvos(){
   return false;
 }
 function receberEstadoFirebase(s){
+  if(sincronizacaoFirebaseAtiva&&_syncUiState!=='syncing')atualizarIndicadorSincronizacao('synced');
   var preservarTela=temCamposNaoSalvos()||!!document.querySelector('.modal.active');
   var fotosLocais=Object.assign({},fotosLocaisFirebase);programacoes.forEach(function(p){if(p&&p.numero&&p.fotos)fotosLocais[p.numero]=p.fotos;});
   programacoes=(s.programacoes||[]).map(function(p){var x=Object.assign({},p);if(fotosLocais[x.numero])x.fotos=fotosLocais[x.numero];return x;});
@@ -1136,7 +1212,7 @@ function receberEstadoFirebase(s){
   if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;if(preservarTela){firebaseSnapshotRenderPendente=true;}else{firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);}checarNovasEntregas();}
 }
 window.receiveProgramFirebaseSnapshot=receberEstadoFirebase;
-window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);var codigo=e&&e.code?String(e.code):'sem código';var colecao=e&&e.syncCollection?' na coleção '+String(e.syncCollection):'';toast('Falha ao sincronizar ('+codigo+colecao+'). Confira a conexão e tente novamente.','error');};
+window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);atualizarIndicadorSincronizacao('offline');toast('A conexão com a base compartilhada foi interrompida. Tente novamente.','error',true,true);};
 
 /* ============ SOM DE NOTIFICAÇÃO ============ */
 function playNotifSound(){
@@ -1222,30 +1298,53 @@ async function oferecerMigracaoLocal(candidato){
   try{var n=await window.programFirebase.migrateLocalState(candidato);toast(n+' registro(s) copiado(s) para a base compartilhada.','success');}
   catch(err){toast('A migração não foi concluída. Confira os dados e tente novamente.','error');console.error(err);}
 }
+function mostrarSplashEntrada(titulo,subtitulo){
+  var sp=document.getElementById('splash');if(sp)sp.classList.remove('hide');
+  var dot=document.getElementById('splashReadyDot');if(dot)dot.style.display='none';
+  var t=document.getElementById('splashTitle'),sub=document.getElementById('splashSubMessage');
+  if(t)t.textContent=titulo||'Entrando...';if(sub)sub.textContent=subtitulo||'Aguarde.';
+  var login=document.getElementById('login');if(login)login.classList.add('hidden');
+}
+function mostrarSplashPronto(){var sp=document.getElementById('splash');if(sp)sp.classList.remove('hide');var dot=document.getElementById('splashReadyDot'),t=document.getElementById('splashTitle'),sub=document.getElementById('splashSubMessage');if(dot)dot.style.display='inline-block';if(t)t.textContent='Tudo pronto';if(sub)sub.textContent='Os dados foram carregados e o sistema está pronto para uso.';}
+function ocultarSplashEntrada(){var sp=document.getElementById('splash');if(sp)sp.classList.add('hide');}
+function mostrarLoginEntrada(mensagem,mostrarRetry){
+  ocultarSplashEntrada();
+  var login=document.getElementById('login');if(login)login.classList.remove('hidden');
+  var erro=document.getElementById('loginErro');if(erro){erro.className='erro';erro.textContent=mensagem||'';erro.style.display=mensagem?'block':'none';}
+  var retry=document.getElementById('loginRetry');if(retry)retry.style.display=mostrarRetry?'block':'none';
+}
+async function reintentarEntrada(){
+  mostrarSplashEntrada('Entrando...','Tentando novamente.');
+  try{
+    var api=await aguardarProgramFirebase(),atual=await api.waitForAuth();
+    if(atual)await iniciarSessaoFirebase(atual);else{ocultarSplashEntrada();await fazerLogin();}
+  }catch(err){console.error(err);mostrarLoginEntrada('Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.',true);}
+}
 async function iniciarSessaoFirebase(firebaseUser){
-  var api=await aguardarProgramFirebase();
-  var perfil=await api.getProfile(firebaseUser);
-  var candidato=perfil.role==='Gestor'?(legadoLocalPendente||capturarDadosLegados()):null;
-  user={uid:perfil.uid,email:perfil.email,user:perfil.login||perfil.username||perfil.email,nome:perfil.nome||perfil.email,role:perfil.role,canFuel:perfil.canFuel===true};
-  carregarFotosLocaisUsuario(perfil.uid);
-  sincronizacaoFirebaseAtiva=false;
-  await api.startSync(user);
-  sincronizacaoFirebaseAtiva=true;
-  if(candidato)await oferecerMigracaoLocal(candidato);
-  legadoLocalPendente=null;
-  var sp=document.getElementById('splash');if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);
-  boot();
+  var api=await aguardarProgramFirebase();mostrarSplashEntrada('Carregando dados compartilhados...','Aguarde enquanto buscamos os dados autorizados no Firebase.');
+  try{
+    var perfil=await api.getProfile(firebaseUser);
+    var candidato=perfil.role==='Gestor'?(legadoLocalPendente||capturarDadosLegados()):null;
+    user={uid:perfil.uid,email:perfil.email,user:perfil.login||perfil.username||perfil.email,nome:perfil.nome||perfil.email,role:perfil.role,canFuel:perfil.canFuel===true};
+    carregarFotosLocaisUsuario(perfil.uid);sincronizacaoFirebaseAtiva=false;
+    await api.startSync(user);sincronizacaoFirebaseAtiva=true;atualizarIndicadorSincronizacao('synced');
+    if(candidato)await oferecerMigracaoLocal(candidato);
+    legadoLocalPendente=null;mostrarSplashPronto();await new Promise(function(resolve){setTimeout(resolve,450);});ocultarSplashEntrada();boot();
+  }catch(err){sincronizacaoFirebaseAtiva=false;try{api.stopSync();}catch(_){}throw err;}
 }
 async function fazerLogin(){
   var email=document.getElementById('loginUser').value.trim().toLowerCase();
   var senha=document.getElementById('loginPass').value;
-  var erro=document.getElementById('loginErro');
-  erro.style.display='none';
-  if(!email||!senha){erro.style.display='block';erro.textContent='Informe seu e-mail e sua senha.';return;}
+  if(!email||!senha){mostrarLoginEntrada('Informe seu e-mail e sua senha.',false);return;}
+  mostrarLoginEntrada('',false);mostrarSplashEntrada('Entrando...','Validando seu login e sua senha.');
   try{var api=await aguardarProgramFirebase();var cred=await api.signIn(email,senha);await iniciarSessaoFirebase(cred.user);}
-  catch(err){console.error(err);erro.style.display='block';erro.textContent=(err&&err.code==='auth/invalid-credential')?'E-mail ou senha inválidos.':(err&&err.code==='auth/too-many-requests')?'Muitas tentativas. Aguarde e tente novamente.':(err&&err.message&&err.message.indexOf('Seu acesso')>=0?err.message:'Não foi possível entrar. Confira sua conexão ou fale com o gestor.');}
-}
-async function enviarLinkSenha(){
+  catch(err){
+    console.error(err);
+    var mensagem=(err&&err.code==='auth/invalid-credential')?'E-mail ou senha inválidos.':(err&&err.code==='auth/too-many-requests')?'Muitas tentativas. Aguarde e tente novamente.':(err&&err.message&&err.message.indexOf('Seu acesso')>=0)?err.message:'Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.';
+    var retry=!(err&&(err.code==='auth/invalid-credential'||err.code==='auth/too-many-requests'))&&!(err&&err.message&&err.message.indexOf('Seu acesso')>=0);
+    mostrarLoginEntrada(mensagem,retry);
+  }
+} async function enviarLinkSenha(){
   var email=document.getElementById('loginUser').value.trim().toLowerCase();var erro=document.getElementById('loginErro');
   if(!email){erro.style.display='block';erro.textContent='Digite seu e-mail para receber o link de redefinição.';return;}
   try{var api=await aguardarProgramFirebase();await api.sendPasswordReset(email);erro.style.display='block';erro.className='info-box info';erro.textContent='Se o e-mail estiver cadastrado, você receberá um link para definir uma nova senha.';}
@@ -1260,6 +1359,7 @@ function boot(){
   document.getElementById('menu').classList.remove('hidden');
   document.getElementById('conteudo').classList.remove('hidden');
   document.getElementById('credits').classList.remove('hidden');
+  atualizarIndicadorSincronizacao('synced');
   document.getElementById('nomeUsuario').textContent=user.nome;
   document.getElementById('avatar').textContent=iniciais(user.nome);
   montarMenu();
@@ -1365,7 +1465,7 @@ function renderProgramacao(){
   var btnSalvar=progEditando?'Atualizar Programação':'Criar Programação';
   var ferramentasHistorico=(user&&user.role==='Gestor')?'<div class="prog-list-tools"><input type="file" id="progHistoricoFile" accept=".xlsx,.xls,.csv" onchange="prepararImportacaoHistoricoProgramacoes(this)" style="display:none"><button class="btn blue sm" onclick="document.getElementById(\'progHistoricoFile\').click()">Subir planilha</button></div>':'';
   document.getElementById('conteudo').innerHTML=
-    '<div class="page-head"><h1>'+rocketIcon('md')+' Programação de Entregas</h1><p>Cadastre e gerencie as entregas.</p></div>'
+    '<div class="page-head prog-home-head"><div><h1>'+rocketIcon('md')+' Programação de Entregas</h1><p>Cadastre e gerencie as entregas.</p></div><button type="button" class="prog-home-new" onclick="toggleAcc(&quot;acc-novaProg&quot;)"><span class="prog-home-plus">+</span><span>'+(progEditando?'Editar Programação':'Nova Programação')+'</span></button></div>'
     +'<div class="prog-form-pin"><div class="acc '+(progEditando?'open':'')+'" id="acc-novaProg"><div class="acc-head" onclick="toggleAcc(\'acc-novaProg\')"><div class="acc-title"><div class="acc-ic">'+rocketIcon('sm')+'<span class="sigla-badge">'+(progEditando?'EDIT':'NOVA')+'</span></div><div><div class="acc-name">'+tituloAcc+'</div><div class="acc-meta">'+metaAcc+'</div></div></div><div class="chev"></div></div>'
     +'<div class="acc-body"><div class="acc-body-inner" style="padding-top:16px">'
     +'<div class="grid grid-3">'
@@ -2348,8 +2448,11 @@ aplicarTemaSistema();
   // Legacy shared localStorage is only retained as a separate manager migration candidate; it is never loaded into an authenticated session.
   var lp=document.getElementById('loginPass');if(lp)lp.addEventListener('keydown',function(e){if(e.key==='Enter')fazerLogin();});
   (async function(){
-    try{var api=await aguardarProgramFirebase();var atual=await api.waitForAuth();if(atual)await iniciarSessaoFirebase(atual);else{var sp=document.getElementById('splash');if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);}}
-    catch(err){console.error(err);var sp2=document.getElementById('splash');if(sp2&&sp2.parentNode)sp2.parentNode.removeChild(sp2);}
+    mostrarSplashEntrada('Entrando...','Verificando se sua sessão está ativa.');
+    try{
+      var api=await aguardarProgramFirebase();var atual=await api.waitForAuth();
+      if(atual)await iniciarSessaoFirebase(atual);else mostrarLoginEntrada('',false);
+    }catch(err){console.error(err);mostrarLoginEntrada('Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.',true);}
   })();
 })();
 </script>
@@ -2391,6 +2494,7 @@ let currentTracking = new Map();
 let writeTimer = null;
 let latestState = null;
 let writeChain = Promise.resolve();
+let writeWaiters = [];
 let lastSubmittedFuel = new Set();
 let applyingRemote = false;
 let syncEpoch = 0;
@@ -2510,8 +2614,9 @@ function stopSync() {
   latestState = null;
   if (writeTimer) clearTimeout(writeTimer);
   writeTimer = null;
-}
-function failInitial(err) {
+  writeWaiters.forEach((w) => { if (!w.settled) { w.settled = true; w.reject(new Error('A sincronização foi interrompida.')); } });
+  writeWaiters = [];
+} function failInitial(err) {
   if (initialReject) {
     const reject = initialReject;
     initialReject = null; initialResolve = null;
@@ -2543,20 +2648,36 @@ function receiveCollection(name, snap) {
   publish();
 }
 function scheduleSync(state) {
-  if (!activeProfile || !dataReady || applyingRemote) return;
+  if (!activeProfile || !dataReady) return Promise.reject(new Error('A sincronização ainda não está pronta.'));
+  if (applyingRemote) return Promise.resolve({ written: false });
   latestState = jsonClone(state);
   const epoch = syncEpoch;
-  if (writeTimer) clearTimeout(writeTimer);
-  writeTimer = setTimeout(() => {
-    writeTimer = null;
-    const snapshot = latestState;
-    latestState = null;
-    writeChain = writeChain.then(() => syncStateNow(snapshot, epoch)).catch((e) => {
-      if (epoch === syncEpoch && typeof window.onProgramFirebaseError === 'function') window.onProgramFirebaseError(e);
-    });
-  }, 250);
-}
-async function commitOperations(ops, epoch) {
+  return new Promise((resolve, reject) => {
+    writeWaiters.push({ resolve, reject, settled: false, epoch });
+    if (writeTimer) clearTimeout(writeTimer);
+    writeTimer = setTimeout(() => {
+      writeTimer = null;
+      const snapshot = latestState;
+      latestState = null;
+      const waiters = writeWaiters.filter((w) => !w.settled && w.epoch === epoch);
+      const run = writeChain.then(() => syncStateNow(snapshot, epoch));
+      writeChain = run.then(() => undefined, () => undefined);
+      run.then((written) => {
+        const cancelled = epoch !== syncEpoch;
+        waiters.forEach((w) => {
+          if (w.settled) return;
+          w.settled = true;
+          if (cancelled) w.reject(new Error('A sincronização foi interrompida.'));
+          else w.resolve({ written: written === true });
+        });
+        writeWaiters = writeWaiters.filter((w) => !w.settled);
+      }, (err) => {
+        waiters.forEach((w) => { if (!w.settled) { w.settled = true; w.reject(err); } });
+        writeWaiters = writeWaiters.filter((w) => !w.settled);
+      });
+    }, 250);
+  });
+} async function commitOperations(ops, epoch) {
   if (activeProfile && activeProfile.role === 'Motorista') {
     for (const op of ops) {
       if (epoch !== syncEpoch) throw new Error('A sincronização foi interrompida.');
@@ -2659,9 +2780,10 @@ async function syncStateNow(state, epoch) {
       if (p && p.numero && p.status === 'Entregue') ops.push({ type: 'delete', ref: refPath('rastreamento', p.numero) });
     });
   }
-  if (!ops.length) return;
+  if (!ops.length) return false;
   await commitOperations(ops, epoch);
   newFuelIds.forEach((id) => lastSubmittedFuel.add(id));
+  return true;
 }
 async function migrateLocalState(state) {
   if (!activeProfile || activeProfile.role !== 'Gestor' || !dataReady) throw new Error('Somente o gestor pode migrar dados locais.');
