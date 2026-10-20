@@ -32,6 +32,8 @@ svg{display:block}
 .rocket-icon.sm{width:22px;height:22px}.rocket-icon.md{width:32px;height:32px}.rocket-icon.lg{width:64px;height:64px}.rocket-icon.xl{width:110px;height:110px}
 #splash{position:fixed;inset:0;z-index:2000;background:linear-gradient(160deg,#0F1941 0%,#123A8A 45%,#2175D9 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .5s,visibility .5s;padding:20px}
 #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+#splash .splash-retry{display:none;position:relative;z-index:3;margin-top:18px;padding:11px 18px;border:1px solid rgba(255,255,255,.7);border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font:700 14px sans-serif;cursor:pointer}
+#splash .splash-retry:focus-visible{outline:3px solid #C8F23A;outline-offset:3}
 #splash .stars{position:absolute;inset:0;overflow:hidden}
 #splash .stars span{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.6;animation:twinkle 2s infinite ease-in-out}
 @keyframes twinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
@@ -898,7 +900,7 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
 
 
 /* Tela Programação: indicadores e filtros solicitados */
-.prog-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 14px}
+.prog-summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 14px}
 .prog-summary-card{position:relative;display:flex;min-width:0;min-height:106px;flex-direction:column;justify-content:center;gap:4px;padding:13px 16px;border:1px solid #d9e4ef;border-left:5px solid #2175d9;border-radius:13px;background:linear-gradient(145deg,#fff,#f5f9fd);box-shadow:0 3px 10px rgba(26,57,91,.07)}
 .prog-summary-card:before{content:'';position:absolute;right:12px;top:12px;width:9px;height:9px;border-radius:50%;background:#2175d9;opacity:.88}
 .prog-summary-card .prog-summary-label{font-size:12px;font-weight:800;color:#455b73;letter-spacing:.2px}
@@ -908,9 +910,11 @@ body.tv-display-mode #painelGrid.tv-card-wall .tv-shared-card .pc-schedule-item 
 .prog-summary-scheduled{border-left-color:#43b977}.prog-summary-scheduled:before{background:#43b977}.prog-summary-scheduled .prog-summary-count{color:#21643f}
 .prog-summary-route{border-left-color:#ed9946}.prog-summary-route:before{background:#ed9946}.prog-summary-route .prog-summary-count{color:#87460f}
 .prog-summary-done{border-left-color:#6d9fe9}.prog-summary-done:before{background:#6d9fe9}.prog-summary-done .prog-summary-count{color:#204e8a}
+.prog-summary-total{border-left-color:#C8F23A}.prog-summary-total:before{background:#C8F23A}.prog-summary-total .prog-summary-count{color:#17385b}
 .prog-filters-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(200px,1fr) auto;align-items:end;gap:10px;margin:2px 0 10px;padding:12px;border:1px solid #dce7f2;border-radius:12px;background:linear-gradient(135deg,#f8fbff,#eef5fc)}
 .prog-filter-field{display:flex;min-width:0;flex-direction:column;gap:5px}.prog-filter-field>span{font-size:11px;font-weight:800;color:#415870}
 .prog-clear-filters{min-height:40px;white-space:nowrap}
+@media(max-width:1100px){.prog-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:800px){.prog-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.prog-summary-card{min-height:92px;padding:11px 12px}.prog-summary-card .prog-summary-count{font-size:26px}.prog-filters-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.prog-clear-filters{grid-column:1/-1}}
 @media(max-width:480px){.prog-summary-grid{gap:7px}.prog-summary-card{min-height:82px;padding:9px 10px}.prog-summary-card .prog-summary-label{font-size:10px}.prog-summary-card .prog-summary-count{font-size:23px}.prog-filters-grid{grid-template-columns:minmax(0,1fr)}}
 
@@ -974,8 +978,9 @@ body.dark-mode .agenda-day-panel{background:linear-gradient(145deg,#121c2e,#1019
 <div id="splash">
   <div class="stars" id="stars"></div>
   <div class="rocket-wrap"><svg class="rocket-icon xl" viewBox="0 0 120 120"><use href="#rocket-svg"/></svg></div>
-  <div class="frase"><i id="splashReadyDot" class="splash-ready-dot" style="display:none" aria-hidden="true"></i><b id="splashTitle">Entrando...</b><span id="splashSubMessage">Verificando se sua sessão está ativa.</span></div>
+  <div class="frase"><i id="splashReadyDot" class="splash-ready-dot" style="display:none" aria-hidden="true"></i><b id="splashTitle">Entrando no sistema...</b><span id="splashSubMessage">Estamos verificando seu acesso e preparando os dados compartilhados.</span></div>
   <div class="bar"><i></i></div>
+  <button id="splashReload" class="splash-retry" type="button" onclick="location.reload()">Recarregar sistema</button>
 </div>
 
 <div id="login" class="hidden">
@@ -1353,12 +1358,13 @@ async function oferecerMigracaoLocal(candidato){
 }
 function mostrarSplashEntrada(titulo,subtitulo){
   var sp=document.getElementById('splash');if(sp)sp.classList.remove('hide');
+  var retry=document.getElementById('splashReload');if(retry)retry.style.display='none';
   var dot=document.getElementById('splashReadyDot');if(dot)dot.style.display='none';
   var t=document.getElementById('splashTitle'),sub=document.getElementById('splashSubMessage');
-  if(t)t.textContent=titulo||'Entrando...';if(sub)sub.textContent=subtitulo||'Aguarde.';
+  if(t)t.textContent=titulo||'Entrando no sistema...';if(sub)sub.textContent=subtitulo||'Aguarde enquanto preparamos o sistema.';
   var login=document.getElementById('login');if(login)login.classList.add('hidden');
 }
-function mostrarSplashPronto(){var sp=document.getElementById('splash');if(sp)sp.classList.remove('hide');var dot=document.getElementById('splashReadyDot'),t=document.getElementById('splashTitle'),sub=document.getElementById('splashSubMessage');if(dot)dot.style.display='inline-block';if(t)t.textContent='Tudo pronto';if(sub)sub.textContent='Os dados foram carregados e o sistema está pronto para uso.';}
+function mostrarSplashPronto(){var sp=document.getElementById('splash');if(sp)sp.classList.remove('hide');var retry=document.getElementById('splashReload');if(retry)retry.style.display='none';var dot=document.getElementById('splashReadyDot'),t=document.getElementById('splashTitle'),sub=document.getElementById('splashSubMessage');if(dot)dot.style.display='inline-block';if(t)t.textContent='Tudo pronto';if(sub)sub.textContent='Os dados foram carregados e o sistema está pronto para uso.';}
 function ocultarSplashEntrada(){var sp=document.getElementById('splash');if(sp)sp.classList.add('hide');}
 function mostrarLoginEntrada(mensagem,mostrarRetry){
   ocultarSplashEntrada();
@@ -1367,7 +1373,7 @@ function mostrarLoginEntrada(mensagem,mostrarRetry){
   var retry=document.getElementById('loginRetry');if(retry)retry.style.display=mostrarRetry?'block':'none';
 }
 async function reintentarEntrada(){
-  mostrarSplashEntrada('Entrando...','Tentando novamente.');
+  mostrarSplashEntrada('Entrando no sistema...','Tentando novamente.');
   try{
     var api=await aguardarProgramFirebase(),atual=await api.waitForAuth();
     if(atual)await iniciarSessaoFirebase(atual);else{ocultarSplashEntrada();await fazerLogin();}
@@ -1382,14 +1388,14 @@ async function iniciarSessaoFirebase(firebaseUser){
     carregarFotosLocaisUsuario(perfil.uid);sincronizacaoFirebaseAtiva=false;
     await api.startSync(user);sincronizacaoFirebaseAtiva=true;atualizarIndicadorSincronizacao('synced');
     if(candidato)await oferecerMigracaoLocal(candidato);
-    legadoLocalPendente=null;mostrarSplashPronto();await new Promise(function(resolve){setTimeout(resolve,450);});ocultarSplashEntrada();boot();
+    legadoLocalPendente=null;mostrarSplashPronto();await new Promise(function(resolve){setTimeout(resolve,450);});boot();ocultarSplashEntrada();
   }catch(err){sincronizacaoFirebaseAtiva=false;try{api.stopSync();}catch(_){}throw err;}
 }
 async function fazerLogin(){
   var email=document.getElementById('loginUser').value.trim().toLowerCase();
   var senha=document.getElementById('loginPass').value;
   if(!email||!senha){mostrarLoginEntrada('Informe seu e-mail e sua senha.',false);return;}
-  mostrarLoginEntrada('',false);mostrarSplashEntrada('Entrando...','Validando seu login e sua senha.');
+  mostrarLoginEntrada('',false);mostrarSplashEntrada('Entrando no sistema...','Validando seu login e sua senha.');
   try{var api=await aguardarProgramFirebase();var cred=await api.signIn(email,senha);await iniciarSessaoFirebase(cred.user);}
   catch(err){
     console.error(err);
@@ -1498,11 +1504,13 @@ function renderProgramacao(){
   for(var cc=0;cc<clientes.length;cc++){var cliOpt=clientes[cc],nomeCliOpt=nomeClienteDoCad(cliOpt);optsCliente+='<option value="'+esc(cliOpt.cad)+'">'+esc(cliOpt.cad)+(nomeCliOpt?' - '+esc(nomeCliOpt):'')+'</option>';}
   var hojeResumo=motDiaHojeStr();
   var qtdHoje=programacoes.filter(function(x){return x.dataEntrega===hojeResumo;}).length;
+  var qtdTotalProgramacoes=programacoes.length;
   var qtdProgramado=programacoes.filter(function(x){return x.status==='Programado';}).length;
   var qtdEmRota=programacoes.filter(function(x){return x.status==='Em Rota';}).length;
   var qtdEntregue=programacoes.filter(function(x){return x.status==='Entregue';}).length;
   var resumoHtml='<div class="prog-summary-grid">'
     +'<div class="prog-summary-card prog-summary-today"><span class="prog-summary-label">Programação de hoje</span><b class="prog-summary-count">'+qtdHoje+'</b><small>'+esc(fmtDataBR(hojeResumo))+'</small></div>'
+    +'<div class="prog-summary-card prog-summary-total"><span class="prog-summary-label">Total de programações</span><b class="prog-summary-count">'+qtdTotalProgramacoes+'</b><small>em toda a base</small></div>'
     +'<div class="prog-summary-card prog-summary-scheduled"><span class="prog-summary-label">Programado</span><b class="prog-summary-count">'+qtdProgramado+'</b><small>entregas</small></div>'
     +'<div class="prog-summary-card prog-summary-route"><span class="prog-summary-label">Em Rota</span><b class="prog-summary-count">'+qtdEmRota+'</b><small>entregas</small></div>'
     +'<div class="prog-summary-card prog-summary-done"><span class="prog-summary-label">Entregue</span><b class="prog-summary-count">'+qtdEntregue+'</b><small>entregas</small></div>'
@@ -2552,7 +2560,7 @@ aplicarTemaSistema();
   // Legacy shared localStorage is only retained as a separate manager migration candidate; it is never loaded into an authenticated session.
   var lp=document.getElementById('loginPass');if(lp)lp.addEventListener('keydown',function(e){if(e.key==='Enter')fazerLogin();});
   (async function(){
-    mostrarSplashEntrada('Entrando...','Verificando se sua sessão está ativa.');
+    mostrarSplashEntrada('Entrando no sistema...','Verificando se sua sessão está ativa.');
     try{
       var api=await aguardarProgramFirebase();var atual=await api.waitForAuth();
       if(atual)await iniciarSessaoFirebase(atual);else mostrarLoginEntrada('',false);
@@ -2980,6 +2988,28 @@ window.programFirebase = {
   sendPasswordReset: (email) => sendPasswordResetEmail(auth, email.trim().toLowerCase())
 };
 window.dispatchEvent(new Event('program-firebase-ready'));
+</script>
+
+<script>
+(function(){
+  function telaPronta(){
+    var login=document.getElementById('login');
+    if(login&&!login.classList.contains('hidden'))return true;
+    var conteudo=document.getElementById('conteudo');
+    return !!(conteudo&&!conteudo.classList.contains('hidden')&&conteudo.innerHTML.trim());
+  }
+  function mostrarRecuperacao(){
+    if(telaPronta())return;
+    var splash=document.getElementById('splash');if(splash)splash.classList.remove('hide');
+    var titulo=document.getElementById('splashTitle'),sub=document.getElementById('splashSubMessage'),botao=document.getElementById('splashReload');
+    if(titulo)titulo.textContent='Ainda estamos abrindo o sistema';
+    if(sub)sub.textContent='Aguarde mais um pouco ou toque abaixo para tentar novamente.';
+    if(botao)botao.style.display='inline-flex';
+  }
+  window.addEventListener('error',function(){mostrarRecuperacao();});
+  window.addEventListener('unhandledrejection',function(){mostrarRecuperacao();});
+  window.setTimeout(mostrarRecuperacao,15000);
+})();
 </script>
 </body>
 </html>
