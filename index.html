@@ -1173,13 +1173,13 @@ function statusComHora(p){
   if(p.horaFim)html+='<div style="font-size:11.5px;color:#1e40af;font-weight:700;margin-top:3px">Fim: '+esc(p.horaFim)+'</div>';
   return html;
 }
-var _syncUiState='offline',_firebaseSaveSequence=0,_firebaseSaveToastCapture=0,_firebaseSaveToastPending=0,_firebaseSaveCaptureTimer=null,_firebaseRetryState=false,_firebaseExpectedFuelId='',_firebaseRetryFuelId='',_firebaseExpectedFuelAction='',_firebaseRetryFuelAction='',_fuelRecordSyncStatus={};
+var _syncUiState='offline',_firebaseSaveSequence=0,_firebaseSaveToastCapture=0,_firebaseSaveToastPending=0,_firebaseSaveCaptureTimer=null,_firebaseRetryState=false;
 function atualizarIndicadorSincronizacao(estado){
   _syncUiState=estado;
   var wrap=document.getElementById('syncIndicator'),label=document.getElementById('syncLabel');
   if(!wrap||!label)return;
-  var nomes={syncing:'Sincronizando',synced:'Sincronizado',offline:'Não confirmado'};
-  var titulos={syncing:'Aguardando confirmação do Firebase',synced:'Firebase confirmou a sincronização',offline:'A última alteração não foi confirmada no Firebase'};
+  var nomes={syncing:'Sincronizando',synced:'Sincronizado',offline:'Sem conexão'};
+  var titulos={syncing:'Aguardando confirmação do Firebase',synced:'Firebase confirmou a sincronização',offline:'A última operação não foi confirmada'};
   wrap.setAttribute('data-state',estado);wrap.title=titulos[estado]||'';label.textContent=nomes[estado]||'Sem conexão';
 }
 function toast(msg,tipo,ignorarConfirmacao,mostrarRetry){
@@ -1202,32 +1202,22 @@ var sincronizacaoFirebaseAtiva=false;
 function estadoAtualDB(){return {programacoes:programacoes,clientes:clientes,regioes:regioes,abastecimentos:abastecimentos,veiculosAbastecimento:veiculosAbastecimento,motoristasAbastecimento:motoristasAbastecimento};}
 function chaveDBLocal(){return DB_KEY+(user&&user.uid?'_user_'+user.uid:'');}
 function salvarDBLocal(){try{localStorage.setItem(chaveDBLocal(),JSON.stringify(estadoAtualDB()));return true;}catch(e){return false;}}
-function concluirGravacaoFirebase(seq,resultado,expectedFuelId,expectedFuelAction){
+function concluirGravacaoFirebase(seq,resultado){
   if(seq!==_firebaseSaveSequence)return;
-  var idsAlterados=resultado&&Array.isArray(resultado.fuelChangedIds)?resultado.fuelChangedIds:[];
-  var confirmado=!expectedFuelId||idsAlterados.indexOf(expectedFuelId)>=0;
-  if(expectedFuelId&&!confirmado){
-    _firebaseRetryState=true;_firebaseRetryFuelId=expectedFuelId;_firebaseRetryFuelAction=expectedFuelAction||'update';setFuelRecentStatus(expectedFuelId,'unconfirmed');atualizarIndicadorSincronizacao('offline');
-    if(_firebaseSaveToastPending===seq){_firebaseSaveToastPending=0;toast('O Firebase não confirmou essa alteração no abastecimento. Mantenha os dados anotados e tente novamente.','error',true,true);}
-    return;
-  }
-  _firebaseRetryState=false;_firebaseRetryFuelId='';_firebaseRetryFuelAction='';
-  if(expectedFuelId){if(expectedFuelAction==='delete')removeFuelRecent(expectedFuelId);else setFuelRecentStatus(expectedFuelId,'saved');}
-  atualizarIndicadorSincronizacao('synced');
+  _firebaseRetryState=false;atualizarIndicadorSincronizacao('synced');
   if(_firebaseSaveToastPending===seq){
     _firebaseSaveToastPending=0;
-    if(resultado&&resultado.written===true){var msg=expectedFuelAction==='delete'?'Pronto! A exclusão do abastecimento foi gravada na base compartilhada.':expectedFuelAction==='update'?'Pronto! A alteração do abastecimento foi gravada na base compartilhada.':expectedFuelId?'Pronto! O abastecimento foi gravado na base compartilhada.':'Pronto! A movimentação foi gravada na base compartilhada.';toast(msg,'success',true,false);}
+    if(resultado&&resultado.written===true)toast('Pronto! A movimentação foi gravada na base compartilhada.','success',true,false);
     else toast('Nenhuma alteração nova foi gravada na base compartilhada.','info',true,false);
   }
 }
-function falhaGravacaoFirebase(seq,err,expectedFuelId,expectedFuelAction){
+function falhaGravacaoFirebase(seq,err){
   if(seq!==_firebaseSaveSequence)return;
-  _firebaseSaveToastCapture=0;_firebaseRetryState=true;if(expectedFuelId){_firebaseRetryFuelId=expectedFuelId;_firebaseRetryFuelAction=expectedFuelAction||'update';setFuelRecentStatus(expectedFuelId,'unconfirmed');}atualizarIndicadorSincronizacao('offline');
+  _firebaseSaveToastCapture=0;_firebaseRetryState=true;atualizarIndicadorSincronizacao('offline');
   console.error('Falha ao confirmar gravação no Firebase:',err);
-  if(_firebaseSaveToastPending===seq)toast('Não recebemos a confirmação da gravação. Mantenha os dados anotados e tente novamente.','error',true,true);
+  if(_firebaseSaveToastPending===seq)toast('Não recebemos a confirmação da gravação. Verifique a conexão e tente novamente.','error',true,true);
 }
 function saveDB(){
-  var expectedFuelId=_firebaseExpectedFuelId,expectedFuelAction=_firebaseExpectedFuelAction;_firebaseExpectedFuelId='';_firebaseExpectedFuelAction='';
   var salvoLocal=salvarDBLocal();
   if(sincronizacaoFirebaseAtiva&&window.programFirebase&&user){
     var seq=++_firebaseSaveSequence;
@@ -1239,21 +1229,20 @@ function saveDB(){
     try{
       var p=window.programFirebase.syncState(estadoAtualDB());
       if(!p||typeof p.then!=='function')throw new Error('A gravação não retornou uma confirmação do Firebase.');
-      p.then(function(resultado){concluirGravacaoFirebase(seq,resultado,expectedFuelId,expectedFuelAction);}).catch(function(err){falhaGravacaoFirebase(seq,err,expectedFuelId,expectedFuelAction);});
-    }catch(err){falhaGravacaoFirebase(seq,err,expectedFuelId,expectedFuelAction);}
+      p.then(function(resultado){concluirGravacaoFirebase(seq,resultado);}).catch(function(err){falhaGravacaoFirebase(seq,err);});
+    }catch(err){falhaGravacaoFirebase(seq,err);}
   }
   return salvoLocal;
 }
 function retryPendingSync(){
   if(!sincronizacaoFirebaseAtiva||!window.programFirebase||!user)return;
-  var expectedFuelId=_firebaseRetryFuelId,expectedFuelAction=_firebaseRetryFuelAction;
   var seq=++_firebaseSaveSequence;_firebaseSaveToastCapture=0;_firebaseSaveToastPending=seq;_firebaseRetryState=false;
   atualizarIndicadorSincronizacao('syncing');
   try{
     var p=window.programFirebase.syncState(estadoAtualDB());
     if(!p||typeof p.then!=='function')throw new Error('A gravação não retornou uma confirmação do Firebase.');
-    p.then(function(resultado){concluirGravacaoFirebase(seq,resultado,expectedFuelId,expectedFuelAction);}).catch(function(err){falhaGravacaoFirebase(seq,err,expectedFuelId,expectedFuelAction);});
-  }catch(err){falhaGravacaoFirebase(seq,err,expectedFuelId,expectedFuelAction);}
+    p.then(function(resultado){concluirGravacaoFirebase(seq,resultado);}).catch(function(err){falhaGravacaoFirebase(seq,err);});
+  }catch(err){falhaGravacaoFirebase(seq,err);}
 }
 function loadDB(chave){try{var raw=localStorage.getItem(chave||DB_KEY);if(raw){var d=JSON.parse(raw);programacoes=d.programacoes||[];clientes=d.clientes||[];regioes=d.regioes||REGIOES_DEFAULT.slice();abastecimentos=d.abastecimentos||[];veiculosAbastecimento=d.veiculosAbastecimento||[];motoristasAbastecimento=d.motoristasAbastecimento||['Joel','Robson','Alexandre','Roger','Fabio'];return true;}}catch(e){}return false;}
 function capturarDadosLegados(){try{var raw=localStorage.getItem(DB_KEY);if(!raw)return null;var d=JSON.parse(raw);return {programacoes:d.programacoes||[],clientes:d.clientes||[],regioes:d.regioes||[],abastecimentos:d.abastecimentos||[],veiculosAbastecimento:d.veiculosAbastecimento||[],motoristasAbastecimento:d.motoristasAbastecimento||[]};}catch(e){return null;}}
@@ -1283,8 +1272,6 @@ function receberEstadoFirebase(s){
   if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;if(preservarTela){firebaseSnapshotRenderPendente=true;}else{firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);}checarNovasEntregas();}
 }
 window.receiveProgramFirebaseSnapshot=receberEstadoFirebase;
-window.onProgramFuelRecordsReady=function(){if(typeof atualizarListaRecenteAbastecimento==='function')atualizarListaRecenteAbastecimento();};
-window.onProgramFuelRecordsError=function(){if(typeof atualizarListaRecenteAbastecimento==='function')atualizarListaRecenteAbastecimento();};
 window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);atualizarIndicadorSincronizacao('offline');toast('A conexão com a base compartilhada foi interrompida. Tente novamente.','error',true,true);};
 
 /* ============ SOM DE NOTIFICAÇÃO ============ */
@@ -2378,24 +2365,8 @@ function montarFormularioAbastecimento(){
     +'<div class="field"><label>Forma de pagamento *</label><select class="input" id="abastPagamento"><option value="">-- Selecione --</option><option>Cartão Empresarial</option><option>VR Abastecimento</option><option>Débito da Empresa</option><option>Pago do bolso</option></select></div>'
     +'</div><div style="margin-top:12px"><button class="btn ok" onclick="salvarAbastecimento()">Salvar abastecimento</button></div></div>';
 }
-function fuelRecentKey(){return 'randstad_fuel_recent_'+String(user&&(user.uid||user.user)||'unknown');}
-function loadFuelRecent(){try{var a=JSON.parse(localStorage.getItem(fuelRecentKey())||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
-function saveFuelRecent(record,status){if(!record||!record.id)return;try{var a=loadFuelRecent(),copy=JSON.parse(JSON.stringify(record));copy._localSyncStatus=status||_fuelRecordSyncStatus[record.id]||'pending';var i=a.findIndex(function(x){return String(x.id)===String(record.id);});if(i>=0)a[i]=copy;else a.unshift(copy);localStorage.setItem(fuelRecentKey(),JSON.stringify(a.slice(0,10)));}catch(e){}}
-function setFuelRecentStatus(id,status){if(!id)return;_fuelRecordSyncStatus[id]=status;var a=loadFuelRecent(),r=a.filter(function(x){return String(x.id)===String(id);})[0]||(abastecimentos||[]).filter(function(x){return String(x.id)===String(id);})[0];if(r)saveFuelRecent(r,status);atualizarListaRecenteAbastecimento();}
-function removeFuelRecent(id){try{localStorage.setItem(fuelRecentKey(),JSON.stringify(loadFuelRecent().filter(function(x){return String(x.id)!==String(id);})));}catch(e){}delete _fuelRecordSyncStatus[id];atualizarListaRecenteAbastecimento();}
-function renderBotoesAbastecimentoProprio(id){return '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn ghost sm" onclick="editarAbastecimento(\''+esc(id)+'\')">Editar</button><button class="btn ghost sm" onclick="excluirAbastecimento(\''+esc(id)+'\')">Excluir</button></div>';}
-function renderFuelRecentHtml(){
-  var login=String(user&&(user.user||user.email)||'').trim().toLowerCase(),items=loadFuelRecent();
-  (abastecimentos||[]).forEach(function(a){if(String(a.registradoPorLogin||'').trim().toLowerCase()!==login)return;var i=items.findIndex(function(x){return String(x.id)===String(a.id);});var c=JSON.parse(JSON.stringify(a));c._localSyncStatus=_fuelRecordSyncStatus[a.id]||((i>=0&&items[i]._localSyncStatus)||'unknown');if(i>=0)items[i]=c;else items.unshift(c);});
-  items=items.filter(function(a){return String(a.registradoPorLogin||'').trim().toLowerCase()===login;}).sort(function(a,b){return String(b.criadoEm||'').localeCompare(String(a.criadoEm||''));}).slice(0,5);
-  var html='<div class="card"><h2>Meus abastecimentos recentes</h2><div class="sub">Registros deste aparelho; a situação confirma se cada lançamento chegou à base compartilhada.</div>';
-  if(!items.length)return html+'<div class="empty">Nenhum abastecimento recente deste usuário neste aparelho.</div></div>';
-  items.forEach(function(a){var st=_fuelRecordSyncStatus[a.id]||a._localSyncStatus||'unknown',lab=st==='saved'?'Confirmado no Firebase':st==='syncing'?'Sincronizando':st==='deleting'?'Exclusão aguardando confirmação':st==='unconfirmed'?'Não confirmado — mantenha os dados anotados':'Confirmação pendente';var cor=st==='saved'?'#117243':st==='syncing'?'#9a6400':'#a33333';var remoteOwn=window.fuelDriverRecordsReady===true&&(abastecimentos||[]).some(function(x){return String(x.id)===String(a.id)&&x.registradoPorLogin===user.user;});var actions=remoteOwn&&user&&user.canFuel===true?renderBotoesAbastecimentoProprio(a.id):'';html+='<div style="border:1px solid #e3eaf2;border-radius:12px;padding:12px;margin-top:10px"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>'+fmtDataBR(a.data)+' · '+esc(a.veiculo||'-')+' · '+esc(a.placa||'-')+'</b><b style="color:'+cor+'">'+lab+'</b></div><div class="sub" style="margin-top:6px">Motorista: '+esc(a.motorista||'-')+' · Odômetro: '+Number(a.odometro||0).toLocaleString('pt-BR')+' km · '+esc(a.combustivel||'-')+'</div><div class="sub">Recibo: '+esc(a.recibo||'-')+' · '+Number(a.litros||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+' L · '+dinheiroAbastecimento(a.total)+'</div>'+actions+'</div>';});
-  return html+'</div>';
-}
-function atualizarListaRecenteAbastecimento(){var el=document.getElementById('abastRecentesMotorista');if(el)el.innerHTML=renderFuelRecentHtml();}
 function renderFormularioAbastecimento(){
-  document.getElementById('conteudo').innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' Abastecimento</h1><p>Registre o abastecimento da frota.</p></div><div class="info-box info"><div>O lançamento é enviado à base compartilhada. Aguarde a confirmação individual do registro; se aparecer Não confirmado, mantenha os dados anotados e procure o gestor.</div></div>'+montarFormularioAbastecimento()+'<div id="abastRecentesMotorista">'+renderFuelRecentHtml()+'</div>';
+  document.getElementById('conteudo').innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' Abastecimento</h1><p>Registre o abastecimento da frota.</p></div><div class="info-box info"><div>O lançamento é enviado à base compartilhada. O painel completo de relatórios fica restrito ao gestor.</div></div>'+montarFormularioAbastecimento();
 }
 function onMudarVeiculoAbastecimento(){var id=document.getElementById('abastVeiculo').value;var v=veiculosAbastecimento.filter(function(x){return x.id===id;})[0];document.getElementById('abastPlaca').value=v?v.placa:'';}
 function calcularTotalAbastecimento(){var litros=numeroAbastecimento('abastLitros'),preco=numeroAbastecimento('abastValorLitro');var total=Math.round(litros*preco*100)/100;var el=document.getElementById('abastTotal');if(el)el.value=dinheiroAbastecimento(total);}
@@ -2412,8 +2383,8 @@ function salvarAbastecimento(){
   var pagamento=document.getElementById('abastPagamento').value;
   if(!data||!v||!motorista||!combustivel||!recibo||km<0||!litros||!preco||!pagamento){toast('Preencha todos os campos obrigatórios','error');return;}
   var total=Math.round(litros*preco*100)/100;
-  var novoAbastecimento={id:'AB-'+Date.now()+'-'+Math.floor(Math.random()*1000),data:data,veiculoId:v.id,veiculo:v.nome,placa:v.placa,motorista:motorista,registradoPor:user.nome,registradoPorLogin:user.user,odometro:km,combustivel:combustivel,recibo:recibo,litros:litros,valorLitro:preco,total:total,pagamento:pagamento,criadoEm:new Date().toISOString()};
-  abastecimentos.push(novoAbastecimento);_firebaseExpectedFuelId=novoAbastecimento.id;_firebaseExpectedFuelAction='create';_fuelRecordSyncStatus[novoAbastecimento.id]='syncing';saveFuelRecent(novoAbastecimento,'syncing');saveDB();toast('Abastecimento salvo');renderAbastecimento();
+  abastecimentos.push({id:'AB-'+Date.now()+'-'+Math.floor(Math.random()*1000),data:data,veiculoId:v.id,veiculo:v.nome,placa:v.placa,motorista:motorista,registradoPor:user.nome,registradoPorLogin:user.user,odometro:km,combustivel:combustivel,recibo:recibo,litros:litros,valorLitro:preco,total:total,pagamento:pagamento,criadoEm:new Date().toISOString()});
+  saveDB();toast('Abastecimento salvo');renderAbastecimento();
 }
 function abastecimentosComIntervalo(lista){
   var ordenados=lista.slice().sort(function(a,b){var da=a.data||'',db=b.data||'';if(da!==db)return da.localeCompare(db);return String(a.criadoEm||'').localeCompare(String(b.criadoEm||''));});
@@ -2525,36 +2496,6 @@ function confirmarImportacaoAbastecimentos(){
   lista.forEach(function(x){var a=x.record;a.id='AB-IMP-'+Date.now()+'-'+Math.floor(Math.random()*100000);a.criadoEm=agoraISO;var v=veiculosAbastecimento.filter(function(y){return String(y.placa).replace(/[^a-z0-9]/gi,'').toUpperCase()===String(a.placa).replace(/[^a-z0-9]/gi,'').toUpperCase()&&normalizarCad(y.nome)===normalizarCad(a.veiculo);})[0];if(!v){v={id:'VEI-IMP-'+Date.now()+'-'+Math.floor(Math.random()*100000),nome:a.veiculo,placa:a.placa,ativo:true};veiculosAbastecimento.push(v);}a.veiculoId=v.id;if(a.motorista&&a.motorista!=='Não informado'&&!motoristasAbastecimento.some(function(m){return normalizarCad(m)===normalizarCad(a.motorista);}))motoristasAbastecimento.push(a.motorista);abastecimentos.push(a);importados++;});
   saveDB();abastImportacaoPendente=null;toast(importados+' abastecimento(s) enviados para a base compartilhada');renderAbastecimentoGestor();
 }
-function fecharEditorAbastecimento(){var m=document.getElementById('abastEditModal');if(m)m.remove();window._abastEditingId='';}
-function atualizarTotalEdicaoAbastecimento(){var l=numeroAbastecimento('editAbastLitros'),p=numeroAbastecimento('editAbastPreco'),el=document.getElementById('editAbastTotal');if(el)el.value=dinheiroAbastecimento(Math.round(l*p*100)/100);}
-function podeModificarAbastecimento(a){if(gestorAbastecimento())return true;return !!(a&&user&&user.canFuel===true&&window.fuelDriverRecordsReady===true&&a.registradoPorLogin===user.user&&(abastecimentos||[]).some(function(x){return String(x.id)===String(a.id)&&x.registradoPorLogin===user.user;}));}
-function editarAbastecimento(id){
-  var a=abastecimentos.filter(function(x){return String(x.id)===String(id);})[0];if(!a){toast('Registro não encontrado na base carregada','error');return;}if(!podeModificarAbastecimento(a)){toast('Você só pode editar seus próprios abastecimentos carregados da base.','error');return;}
-  window._abastEditingId=String(id);
-  var veicOptions='',temVeic=false;(veiculosAbastecimento||[]).forEach(function(v){var sel=String(v.id)===String(a.veiculoId);if(sel)temVeic=true;veicOptions+='<option value="'+esc(v.id)+'"'+(sel?' selected':'')+'>'+esc(v.nome)+' · '+esc(v.placa)+(v.ativo===false?' (inativo)':'')+'</option>';});
-  if(!temVeic)veicOptions='<option value="'+esc(a.veiculoId||'')+'" selected>'+esc(a.veiculo||'Veículo')+' · '+esc(a.placa||'')+'</option>'+veicOptions;
-  var motoristas=(motoristasAbastecimento||[]).slice();if(a.motorista&&motoristas.indexOf(a.motorista)<0)motoristas.push(a.motorista);var motOptions='';motoristas.forEach(function(m){motOptions+='<option'+(m===a.motorista?' selected':'')+'>'+esc(m)+'</option>';});
-  var fuels=['Etanol','Diesel','Gasolina'].map(function(x){return '<option'+(x===a.combustivel?' selected':'')+'>'+x+'</option>';}).join('');
-  var pays=['Cartão Empresarial','VR Abastecimento','Débito da Empresa','Pago do bolso'].map(function(x){return '<option'+(x===a.pagamento?' selected':'')+'>'+x+'</option>';}).join('');
-  var modal=document.createElement('div');modal.id='abastEditModal';modal.style.cssText='position:fixed;inset:0;z-index:12000;background:rgba(7,18,38,.68);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;';
-  modal.innerHTML='<div class="card" style="width:min(760px,100%);max-height:92vh;overflow:auto;padding:20px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h2 style="margin:0">Editar abastecimento</h2><div class="sub">As alterações serão sincronizadas com a base compartilhada.</div></div><button type="button" class="btn ghost sm" onclick="fecharEditorAbastecimento()">Fechar</button></div><div class="grid grid-2" style="margin-top:12px"><div class="field"><label>Data *</label><input class="input" type="date" id="editAbastData" value="'+esc(a.data||'')+'"></div><div class="field"><label>Veículo *</label><select class="input" id="editAbastVeiculo">'+veicOptions+'</select></div><div class="field"><label>Motorista *</label><select class="input" id="editAbastMotorista">'+motOptions+'</select></div><div class="field"><label>Odômetro (km) *</label><input class="input" type="number" min="0" step="1" id="editAbastKm" value="'+esc(a.odometro==null?'':a.odometro)+'"></div><div class="field"><label>Combustível *</label><select class="input" id="editAbastCombustivel">'+fuels+'</select></div><div class="field"><label>Nº do recibo *</label><input class="input" id="editAbastRecibo" value="'+esc(a.recibo||'')+'"></div><div class="field"><label>Litros *</label><input class="input" type="number" min="0.01" step="0.001" id="editAbastLitros" value="'+esc(a.litros==null?'':a.litros)+'" oninput="atualizarTotalEdicaoAbastecimento()"></div><div class="field"><label>Valor por litro (R$) *</label><input class="input" type="number" min="0.01" step="0.001" id="editAbastPreco" value="'+esc(a.valorLitro==null?'':a.valorLitro)+'" oninput="atualizarTotalEdicaoAbastecimento()"></div><div class="field"><label>Total</label><input class="input" id="editAbastTotal" value="'+dinheiroAbastecimento(a.total)+'" readonly></div><div class="field"><label>Forma de pagamento *</label><select class="input" id="editAbastPagamento">'+pays+'</select></div></div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button type="button" class="btn ghost" onclick="fecharEditorAbastecimento()">Cancelar</button><button type="button" class="btn ok" onclick="salvarEdicaoAbastecimento()">Salvar alterações</button></div></div>';
-  modal.addEventListener('click',function(e){if(e.target===modal)fecharEditorAbastecimento();});document.body.appendChild(modal);
-}
-function salvarEdicaoAbastecimento(){
-  var id=window._abastEditingId,a=abastecimentos.filter(function(x){return String(x.id)===String(id);})[0];if(!a||!podeModificarAbastecimento(a)){fecharEditorAbastecimento();toast('Este abastecimento não pode ser alterado por este acesso.','error');return;}
-  var data=document.getElementById('editAbastData').value,veiculoId=document.getElementById('editAbastVeiculo').value,veic=veiculosAbastecimento.filter(function(v){return String(v.id)===String(veiculoId);})[0],motorista=document.getElementById('editAbastMotorista').value,km=numeroAbastecimento('editAbastKm'),combustivel=document.getElementById('editAbastCombustivel').value,recibo=document.getElementById('editAbastRecibo').value.trim(),litros=numeroAbastecimento('editAbastLitros'),preco=numeroAbastecimento('editAbastPreco'),pagamento=document.getElementById('editAbastPagamento').value;
-  if(!veic&&String(veiculoId)===String(a.veiculoId))veic={id:a.veiculoId,nome:a.veiculo,placa:a.placa};
-  if(!data||!veic||!motorista||!combustivel||!recibo||km<0||!litros||!preco||!pagamento){toast('Confira os campos obrigatórios','error');return;}
-  a.data=data;a.veiculoId=veic.id;a.veiculo=veic.nome;a.placa=veic.placa;a.motorista=motorista;a.odometro=km;a.combustivel=combustivel;a.recibo=recibo;a.litros=litros;a.valorLitro=preco;a.total=Math.round(litros*preco*100)/100;a.pagamento=pagamento;a.editadoEm=new Date().toISOString();a.editadoPor=user.nome;
-  _firebaseExpectedFuelId=String(id);_firebaseExpectedFuelAction='update';if(!gestorAbastecimento()){setFuelRecentStatus(id,'syncing');saveFuelRecent(a,'syncing');}fecharEditorAbastecimento();saveDB();toast('Abastecimento atualizado');if(gestorAbastecimento())renderAbastecimentoGestor();else renderFormularioAbastecimento();
-}
-function excluirAbastecimento(id){
-  var i=abastecimentos.findIndex(function(x){return String(x.id)===String(id);});if(i<0){toast('Registro não encontrado na base carregada','error');return;}
-  var a=abastecimentos[i];if(!podeModificarAbastecimento(a)){toast('Você só pode excluir seus próprios abastecimentos carregados da base.','error');return;}
-  if(!window.confirm('Excluir o abastecimento de '+(a.data||'')+' · '+(a.veiculo||'')+' · '+(a.placa||'')+'? Esta ação será sincronizada para os demais usuários.'))return;
-  _firebaseExpectedFuelId=String(id);_firebaseExpectedFuelAction='delete';if(!gestorAbastecimento())setFuelRecentStatus(id,'deleting');abastecimentos.splice(i,1);saveDB();toast('Abastecimento excluído');if(gestorAbastecimento())renderAbastecimentoGestor();else renderFormularioAbastecimento();
-}
-function renderAcoesAbastecimento(id){return '<td style="white-space:nowrap"><button class="btn ghost sm" onclick="editarAbastecimento(\''+esc(id)+'\')">Editar</button> <button class="btn ghost sm" onclick="excluirAbastecimento(\''+esc(id)+'\')">Excluir</button></td>';}
 function renderAbastecimentoGestor(){
   var lista=filtroAbastecimentos();var m=metricasAbastecimentos(lista);var veics=veiculosAbastecimento.slice().sort(function(a,b){return a.nome.localeCompare(b.nome);});
   var kpis='<div class="fuel-kpis">'
@@ -2567,8 +2508,8 @@ function renderAbastecimentoGestor(){
   var porVeiculo=Object.keys(m.porVeiculo).map(function(k){return m.porVeiculo[k];});
   var rowsV='';porVeiculo.sort(function(a,b){return a.veiculo.localeCompare(b.veiculo);}).forEach(function(v){rowsV+='<tr><td>'+esc(v.veiculo)+'</td><td>'+esc(v.placa)+'</td><td>'+Math.round(v.km).toLocaleString('pt-BR')+' km</td><td>'+v.litros.toLocaleString('pt-BR',{maximumFractionDigits:2})+' L</td><td>'+dinheiroAbastecimento(v.custo)+'</td><td>'+dinheiroAbastecimento(v.litros?v.custo/v.litros:0)+'</td><td>'+ (v.litrosConsumo?(v.km/v.litrosConsumo).toLocaleString('pt-BR',{maximumFractionDigits:2})+' km/L':'—')+'</td></tr>';});
   if(!rowsV)rowsV='<tr><td colspan="7" class="empty">Sem abastecimentos no período selecionado.</td></tr>';
-  var rows='';lista.forEach(function(a){rows+='<tr><td>'+fmtDataBR(a.data)+'</td><td>'+esc(a.veiculo||'-')+'<br><small>'+esc(a.placa||'-')+'</small></td><td>'+esc(a.motorista||'-')+'</td><td>'+esc(a.registradoPor||'-')+'</td><td>'+Number(a.odometro||0).toLocaleString('pt-BR')+'</td><td>'+esc(a.combustivel||'-')+'</td><td>'+esc(a.recibo||'-')+'</td><td>'+Number(a.litros||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td><td>'+dinheiroAbastecimento(a.valorLitro)+'</td><td>'+dinheiroAbastecimento(a.total)+'</td><td>'+esc(a.pagamento||'-')+'</td><td>'+ (a.kmIntervalo==null?'—':Math.round(a.kmIntervalo).toLocaleString('pt-BR')+' km')+'</td><td>'+ (a.consumoIntervalo==null?'—':a.consumoIntervalo.toLocaleString('pt-BR',{maximumFractionDigits:2})+' km/L')+'</td>'+renderAcoesAbastecimento(a.id)+'</tr>';});
-  if(!rows)rows='<tr><td colspan="14" class="empty">Nenhum abastecimento no período.</td></tr>';
+  var rows='';lista.forEach(function(a){rows+='<tr><td>'+fmtDataBR(a.data)+'</td><td>'+esc(a.veiculo||'-')+'<br><small>'+esc(a.placa||'-')+'</small></td><td>'+esc(a.motorista||'-')+'</td><td>'+esc(a.registradoPor||'-')+'</td><td>'+Number(a.odometro||0).toLocaleString('pt-BR')+'</td><td>'+esc(a.combustivel||'-')+'</td><td>'+esc(a.recibo||'-')+'</td><td>'+Number(a.litros||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td><td>'+dinheiroAbastecimento(a.valorLitro)+'</td><td>'+dinheiroAbastecimento(a.total)+'</td><td>'+esc(a.pagamento||'-')+'</td><td>'+ (a.kmIntervalo==null?'—':Math.round(a.kmIntervalo).toLocaleString('pt-BR')+' km')+'</td><td>'+ (a.consumoIntervalo==null?'—':a.consumoIntervalo.toLocaleString('pt-BR',{maximumFractionDigits:2})+' km/L')+'</td></tr>';});
+  if(!rows)rows='<tr><td colspan="13" class="empty">Nenhum abastecimento no período.</td></tr>';
   var veiculosHtml='';veiculosAbastecimento.forEach(function(v){veiculosHtml+='<tr><td>'+esc(v.nome)+'</td><td>'+esc(v.placa)+'</td><td>'+(v.ativo===false?'Inativo':'Ativo')+'</td><td><button class="btn ghost sm" onclick="alternarVeiculoAbastecimento(\''+esc(v.id)+'\')">'+(v.ativo===false?'Ativar':'Desativar')+'</button></td></tr>';});
   if(!veiculosHtml)veiculosHtml='<tr><td colspan="4" class="empty">Cadastre o primeiro veículo abaixo.</td></tr>';
   var motoristasHtml=motoristasAbastecimento.map(function(x){return '<span class="pill programado" style="margin:3px">'+esc(x)+'</span>';}).join('');
@@ -2576,7 +2517,7 @@ function renderAbastecimentoGestor(){
     +renderPreviaImportacaoAbastecimento()
     +'<div class="card"><h2>Indicadores</h2><div class="row" style="margin-bottom:12px"><div class="field col"><label>De</label><input class="input" type="date" id="abastFiltroInicio" value="'+esc(abastFiltroInicio)+'" onchange="atualizarFiltrosAbastecimento()"></div><div class="field col"><label>Até</label><input class="input" type="date" id="abastFiltroFim" value="'+esc(abastFiltroFim)+'" onchange="atualizarFiltrosAbastecimento()"></div><div class="field col"><label>Veículo</label><select class="input" id="abastFiltroVeiculo" onchange="atualizarFiltrosAbastecimento()">'+opts+'</select></div><div class="col-fix"><button class="btn ghost" onclick="abastFiltroInicio=\'\';abastFiltroFim=\'\';abastFiltroVeiculo=\'\';renderAbastecimentoGestor()">Limpar filtros</button></div></div>'+kpis+'</div>'
     +'<div class="card"><h2>Resumo por veículo</h2><div style="overflow-x:auto"><table><thead><tr><th>Veículo</th><th>Placa</th><th>Km rodados</th><th>Litros</th><th>Custo</th><th>Preço médio/L</th><th>Consumo médio</th></tr></thead><tbody>'+rowsV+'</tbody></table></div></div>'
-    +'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2>Registros e relatório</h2><div class="sub">'+lista.length+' registro(s) no filtro atual.</div></div><button class="btn blue" onclick="exportarRelatorioAbastecimento()">Exportar para Excel</button></div><div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Veículo / placa</th><th>Motorista</th><th>Registrado por</th><th>Odômetro</th><th>Combustível</th><th>Recibo</th><th>Litros</th><th>Preço/L</th><th>Total</th><th>Pagamento</th><th>Km intervalo</th><th>Km/L</th><th>Ações</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'
+    +'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2>Registros e relatório</h2><div class="sub">'+lista.length+' registro(s) no filtro atual.</div></div><button class="btn blue" onclick="exportarRelatorioAbastecimento()">Exportar para Excel</button></div><div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Veículo / placa</th><th>Motorista</th><th>Registrado por</th><th>Odômetro</th><th>Combustível</th><th>Recibo</th><th>Litros</th><th>Preço/L</th><th>Total</th><th>Pagamento</th><th>Km intervalo</th><th>Km/L</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'
     +'<div class="card"><h2>Cadastros da frota</h2><div class="grid grid-2"><div class="field"><label>Nome do veículo *</label><input class="input" id="novoAbastVeiculo" placeholder="Ex.: Fiorino 1"></div><div class="field"><label>Placa *</label><input class="input" id="novaAbastPlaca" maxlength="8" placeholder="ABC1D23"></div></div><button class="btn ok" onclick="adicionarVeiculoAbastecimento()">Adicionar veículo</button><div style="overflow-x:auto;margin-top:14px"><table><thead><tr><th>Veículo</th><th>Placa</th><th>Status</th><th>Ação</th></tr></thead><tbody>'+veiculosHtml+'</tbody></table></div><h2 style="margin-top:20px">Motoristas cadastrados</h2><div>'+motoristasHtml+'</div><div class="row" style="margin-top:12px"><div class="field col"><label>Novo motorista</label><input class="input" id="novoAbastMotorista" placeholder="Nome do motorista"></div><div class="col-fix"><button class="btn ghost" onclick="adicionarMotoristaAbastecimento()">Adicionar motorista</button></div></div></div>'
     +montarFormularioAbastecimento();
 }
@@ -2677,7 +2618,6 @@ let initialResolve = null;
 let initialReject = null;
 let initialPromise = null;
 let initialSeen = new Set();
-window.fuelDriverRecordsReady = false;
 let remote = {};
 let baseline = {};
 let trackingBaseline = new Map();
@@ -2791,8 +2731,6 @@ function publish() {
   } finally { applyingRemote = false; }
 }
 function stopSync() {
-  window.fuelDriverRecordsReady = false;
-  lastSubmittedFuel = new Set();
   syncEpoch++;
   unsubscribers.forEach((u) => { try { u(); } catch (_) {} });
   unsubscribers = [];
@@ -2842,7 +2780,7 @@ function receiveCollection(name, snap) {
 }
 function scheduleSync(state) {
   if (!activeProfile || !dataReady) return Promise.reject(new Error('A sincronização ainda não está pronta.'));
-  if (applyingRemote) return Promise.resolve({ written: false, fuelChangedIds: [] });
+  if (applyingRemote) return Promise.resolve({ written: false });
   latestState = jsonClone(state);
   const epoch = syncEpoch;
   return new Promise((resolve, reject) => {
@@ -2861,7 +2799,7 @@ function scheduleSync(state) {
           if (w.settled) return;
           w.settled = true;
           if (cancelled) w.reject(new Error('A sincronização foi interrompida.'));
-          else w.resolve({ written: !!(written && written.written), fuelChangedIds: written && Array.isArray(written.fuelChangedIds) ? written.fuelChangedIds : [] });
+          else w.resolve({ written: written === true });
         });
         writeWaiters = writeWaiters.filter((w) => !w.settled);
       }, (err) => {
@@ -2945,25 +2883,11 @@ async function syncStateNow(state, epoch) {
   });
   const newFuelIds = [];
   if (activeProfile.canFuel && activeProfile.role !== 'Gestor') {
-    const nowFuel = dataMap('abastecimentos', state.abastecimentos || []);
-    const oldFuel = baseline.abastecimentos || new Map();
-    nowFuel.forEach((data, id) => {
-      if (data.registradoPorLogin !== activeProfile.login) return;
-      const oldData = oldFuel.get(id);
-      if (!oldData) {
-        if (data.registradoPor === activeProfile.nome && !lastSubmittedFuel.has(id)) {
-          newFuelIds.push(id);
-          ops.push({ type: 'set', ref: refPath('abastecimentos', id), data });
-        }
-      } else if (oldData.registradoPorLogin === activeProfile.login && data.registradoPorLogin === oldData.registradoPorLogin && data.registradoPor === oldData.registradoPor && !equal(data, oldData)) {
+    (state.abastecimentos || []).forEach((a) => {
+      const id = String(a.id || '');
+      if (id && a.registradoPorLogin === activeProfile.login && !lastSubmittedFuel.has(id)) {
         newFuelIds.push(id);
-        ops.push({ type: 'set', ref: refPath('abastecimentos', id), data });
-      }
-    });
-    oldFuel.forEach((data, id) => {
-      if (!nowFuel.has(id) && data.registradoPorLogin === activeProfile.login) {
-        newFuelIds.push(id);
-        ops.push({ type: 'delete', ref: refPath('abastecimentos', id) });
+        ops.push({ type: 'set', ref: refPath('abastecimentos', id), data: itemData('abastecimentos', a) });
       }
     });
   }
@@ -2987,17 +2911,10 @@ async function syncStateNow(state, epoch) {
       if (p && p.numero && p.status === 'Entregue') ops.push({ type: 'delete', ref: refPath('rastreamento', p.numero) });
     });
   }
-  const fuelOps = ops.filter((op) => op.ref && op.ref.parent && op.ref.parent.id === 'abastecimentos');
-  const fuelChangedIds = fuelOps.map((op) => op.ref.id);
-  if (!ops.length) return { written: false, fuelChangedIds: [] };
+  if (!ops.length) return false;
   await commitOperations(ops, epoch);
   newFuelIds.forEach((id) => lastSubmittedFuel.add(id));
-  if (fuelOps.length) {
-    const fuelBaseline = baseline.abastecimentos || new Map();
-    fuelOps.forEach((op) => { if (op.type === 'delete') fuelBaseline.delete(op.ref.id); else fuelBaseline.set(op.ref.id, cleanData(op.data)); });
-    baseline.abastecimentos = fuelBaseline;
-  }
-  return { written: true, fuelChangedIds };
+  return true;
 }
 async function migrateLocalState(state) {
   if (!activeProfile || activeProfile.role !== 'Gestor' || !dataReady) throw new Error('Somente o gestor pode migrar dados locais.');
@@ -3026,22 +2943,8 @@ async function startSync(profile) {
   const epoch = syncEpoch;
   const required = requiredCollections(profile);
   initialPromise = new Promise((resolve, reject) => { initialResolve = resolve; initialReject = reject; });
-  window.fuelDriverRecordsReady = false;
   const sub = (name, ref) => {
     const u = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => receiveCollection(name, snap), (err) => failInitial(err));
-    unsubscribers.push(u);
-  };
-  const subOptionalFuel = (ref) => {
-    const u = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
-      if (snap.metadata && snap.metadata.fromCache) return;
-      window.fuelDriverRecordsReady = true;
-      receiveCollection('abastecimentos', snap);
-      if (typeof window.onProgramFuelRecordsReady === 'function') window.onProgramFuelRecordsReady();
-    }, (err) => {
-      window.fuelDriverRecordsReady = false;
-      console.warn('A leitura de abastecimentos próprios não está autorizada ainda.', err);
-      if (typeof window.onProgramFuelRecordsError === 'function') window.onProgramFuelRecordsError(err);
-    });
     unsubscribers.push(u);
   };
   const pRef = collection(db, 'programacoes');
@@ -3056,7 +2959,6 @@ async function startSync(profile) {
     sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'));
   }
   if (profile.role === 'Gestor') sub('abastecimentos', collection(db, 'abastecimentos'));
-  else if (profile.canFuel === true) subOptionalFuel(query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.login)));
   if (canMonitorProfile(profile)) sub('rastreamento', collection(db, 'rastreamento'));
   if (!required.length) throw new Error('Nenhuma coleção autorizada para este perfil.');
   let timeoutId;
