@@ -1173,13 +1173,13 @@ function statusComHora(p){
   if(p.horaFim)html+='<div style="font-size:11.5px;color:#1e40af;font-weight:700;margin-top:3px">Fim: '+esc(p.horaFim)+'</div>';
   return html;
 }
-var _syncUiState='offline',_firebaseSaveSequence=0,_firebaseSaveToastCapture=0,_firebaseSaveToastPending=0,_firebaseSaveCaptureTimer=null,_firebaseRetryState=false;
+var _syncUiState='offline',_firebaseSaveSequence=0,_firebaseSaveToastCapture=0,_firebaseSaveToastPending=0,_firebaseSaveCaptureTimer=null,_firebaseRetryState=false,_programStatusSaveBusy={};
 function atualizarIndicadorSincronizacao(estado){
   _syncUiState=estado;
   var wrap=document.getElementById('syncIndicator'),label=document.getElementById('syncLabel');
   if(!wrap||!label)return;
-  var nomes={syncing:'Sincronizando',synced:'Sincronizado',offline:'Sem conexão'};
-  var titulos={syncing:'Aguardando confirmação do Firebase',synced:'Firebase confirmou a sincronização',offline:'A última operação não foi confirmada'};
+  var nomes={saving:'Gravando informações...',syncing:'Sincronizando',synced:'Sincronizado',offline:'Sem conexão'};
+  var titulos={saving:'Aguardando a confirmação desta entrega no Firebase',syncing:'Aguardando confirmação do Firebase',synced:'Firebase confirmou a sincronização',offline:'A última operação não foi confirmada'};
   wrap.setAttribute('data-state',estado);wrap.title=titulos[estado]||'';label.textContent=nomes[estado]||'Sem conexão';
 }
 function toast(msg,tipo,ignorarConfirmacao,mostrarRetry){
@@ -1204,7 +1204,7 @@ function chaveDBLocal(){return DB_KEY+(user&&user.uid?'_user_'+user.uid:'');}
 function salvarDBLocal(){try{localStorage.setItem(chaveDBLocal(),JSON.stringify(estadoAtualDB()));return true;}catch(e){return false;}}
 function concluirGravacaoFirebase(seq,resultado){
   if(seq!==_firebaseSaveSequence)return;
-  _firebaseRetryState=false;atualizarIndicadorSincronizacao('synced');
+  _firebaseRetryState=false;if(!Object.keys(_programStatusSaveBusy||{}).length)atualizarIndicadorSincronizacao('synced');
   if(_firebaseSaveToastPending===seq){
     _firebaseSaveToastPending=0;
     if(resultado&&resultado.written===true)toast('Pronto! A movimentação foi gravada na base compartilhada.','success',true,false);
@@ -1216,6 +1216,35 @@ function falhaGravacaoFirebase(seq,err){
   _firebaseSaveToastCapture=0;_firebaseRetryState=true;atualizarIndicadorSincronizacao('offline');
   console.error('Falha ao confirmar gravação no Firebase:',err);
   if(_firebaseSaveToastPending===seq)toast('Não recebemos a confirmação da gravação. Verifique a conexão e tente novamente.','error',true,true);
+}
+function capturarCamposStatusEntrega(p){
+  var campos=['status','horaInicio','inicioRealISO','horaFim','fimRealISO','duracaoEntregaMinutos','quemRecebeu','lidoPor','localizacaoAtual'];
+  var out={};campos.forEach(function(k){var existe=Object.prototype.hasOwnProperty.call(p,k),v=p[k];if(v&&typeof v==='object')v=JSON.parse(JSON.stringify(v));out[k]={existe:existe,valor:v};});return out;
+}
+function aplicarCamposStatusEntrega(num,snapshot){
+  var p=encontrarProgPorNumero(num);if(!p||!snapshot)return false;
+  Object.keys(snapshot).forEach(function(k){var x=snapshot[k];if(x.existe)p[k]=x.valor;else delete p[k];});return true;
+}
+function salvarStatusEntregaConfirmado(num,acao,anterior,desejado,patch,aoSucesso,aoFalhar){
+  var id=String(num||'');if(!id||_programStatusSaveBusy[id])return false;
+  if(!sincronizacaoFirebaseAtiva||!window.programFirebase||!user||typeof window.programFirebase.saveProgramStatus!=='function'){
+    aplicarCamposStatusEntrega(id,anterior);salvarDBLocal();atualizarIndicadorSincronizacao('offline');toast('A entrega não foi enviada: o Firebase não está conectado.','error',true,false);if(aoFalhar)aoFalhar();return false;
+  }
+  _programStatusSaveBusy[id]=true;salvarDBLocal();atualizarIndicadorSincronizacao('saving');toast('Gravando informações...','info',true,false);
+  var p;
+  try{p=window.programFirebase.saveProgramStatus(id,patch);if(!p||typeof p.then!=='function')throw new Error('A gravação não retornou uma confirmação do Firebase.');}
+  catch(err){delete _programStatusSaveBusy[id];aplicarCamposStatusEntrega(id,anterior);salvarDBLocal();atualizarIndicadorSincronizacao('offline');console.error('Falha ao gravar status da entrega:',err);toast('Não recebi confirmação do Firebase. A entrega continua no status anterior; confira a conexão e tente novamente.','error',true,false);if(aoFalhar)aoFalhar();return false;}
+  Promise.resolve(p).then(function(resultado){
+    if(!resultado||resultado.written!==true||String(resultado.programId)!==id)throw new Error('O Firebase não confirmou este agendamento específico.');
+    delete _programStatusSaveBusy[id];aplicarCamposStatusEntrega(id,desejado);salvarDBLocal();atualizarIndicadorSincronizacao('synced');
+    toast(acao==='iniciar'?'Pronto! O início da entrega foi gravado na base compartilhada.':'Pronto! A finalização da entrega foi gravada na base compartilhada.','success',true,false);
+    if(aoSucesso)aoSucesso();
+  }).catch(function(err){
+    delete _programStatusSaveBusy[id];aplicarCamposStatusEntrega(id,anterior);salvarDBLocal();_firebaseRetryState=true;atualizarIndicadorSincronizacao('offline');console.error('Falha ao confirmar status da entrega:',err);
+    toast('Não recebi confirmação do Firebase. A entrega continua no status anterior; confira a conexão e tente novamente.','error',true,false);
+    if(aoFalhar)aoFalhar();
+  });
+  return true;
 }
 function saveDB(){
   var salvoLocal=salvarDBLocal();
@@ -1261,7 +1290,7 @@ function temCamposNaoSalvos(){
   return false;
 }
 function receberEstadoFirebase(s){
-  if(sincronizacaoFirebaseAtiva&&_syncUiState!=='syncing')atualizarIndicadorSincronizacao('synced');
+  if(sincronizacaoFirebaseAtiva&&_syncUiState!=='syncing'&&_syncUiState!=='saving')atualizarIndicadorSincronizacao('synced');
   var preservarTela=temCamposNaoSalvos()||!!document.querySelector('.modal.active');
   var fotosLocais=Object.assign({},fotosLocaisFirebase);programacoes.forEach(function(p){if(p&&p.numero&&p.fotos)fotosLocais[p.numero]=p.fotos;});
   programacoes=(s.programacoes||[]).map(function(p){var x=Object.assign({},p);if(fotosLocais[x.numero])x.fotos=fotosLocais[x.numero];return x;});
@@ -1440,6 +1469,7 @@ function boot(){
   if(user.role==='Motorista'){navSub('motorista');}
   else{navSub('programacao');}
   iniciarNotifWatcher();
+  if(user.role==='Motorista')setTimeout(atualizarGPSAtivoAoRetornar,600);
 }
 
 /* ============ MENU ============ */
@@ -2093,6 +2123,15 @@ function capturarPosicaoEntrega(num,callbackErro,callbackOk){
   navigator.geolocation.getCurrentPosition(function(pos){var ok=gravarPosicaoLocal(num,pos);if(callbackOk)callbackOk(ok,pos);},function(err){var msg=err&&err.code===1?'Permissão de localização negada. Libere a localização nas configurações do navegador.':'Não consegui obter o GPS. Confira a localização do celular e tente novamente.';if(callbackErro)callbackErro(msg);},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
 function iniciarAtualizacoesLocalizacao(num){if(rastreadoresMotorista[num])return;rastreadoresMotorista[num]=setInterval(function(){var p=encontrarProgPorNumero(num);if(!p||p.status!=='Em Rota'){pararAtualizacoesLocalizacao(num);return;}capturarPosicaoEntrega(num,null);},300000);}
+var _gpsRetornoUltimaCaptura=0;
+function atualizarGPSAtivoAoRetornar(){
+  if(!user||user.role!=='Motorista'||document.visibilityState==='hidden')return;
+  var agoraMs=Date.now();if(agoraMs-_gpsRetornoUltimaCaptura<12000)return;_gpsRetornoUltimaCaptura=agoraMs;
+  (programacoes||[]).forEach(function(p){if(!p||p.motorista!==user.nome||p.status!=='Em Rota')return;iniciarAtualizacoesLocalizacao(p.numero);capturarPosicaoEntrega(p.numero,function(msg){console.warn('GPS não atualizado ao retornar ao app:',msg);});});
+}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')setTimeout(atualizarGPSAtivoAoRetornar,400);});
+window.addEventListener('pageshow',function(){setTimeout(atualizarGPSAtivoAoRetornar,400);});
+window.addEventListener('focus',function(){setTimeout(atualizarGPSAtivoAoRetornar,400);});
 function pararAtualizacoesLocalizacao(num){if(rastreadoresMotorista[num]){clearInterval(rastreadoresMotorista[num]);delete rastreadoresMotorista[num];}}
 function motRetomarRastreamento(num){var p=encontrarProgPorNumero(num);if(!user||user.role!=='Motorista'||!p||p.motorista!==user.nome||p.status!=='Em Rota'){toast('Somente o motorista designado pode retomar o envio da localização','error');return;}if(!confirm('Retomar o envio da sua localização a cada 5 minutos até finalizar esta entrega?'))return;capturarPosicaoEntrega(num,function(msg){toast(msg,'error');},function(ok){if(!ok)return;iniciarAtualizacoesLocalizacao(num);toast('Atualização de localização retomada');});}
 
@@ -2222,12 +2261,40 @@ function prepararFotoLocal(file,callback){
   };reader.readAsDataURL(file);
 }
 function motIniciarModal(num){
-  var p=encontrarProgPorNumero(num);if(!p)return;if(!user||user.role!=='Motorista'||p.motorista!==user.nome){toast('Somente o motorista designado pode iniciar esta entrega','error');return;}if(p.status!=='Programado'){toast('Esta entrega não está aguardando início','error');return;}if(!navigator.geolocation){toast('Este navegador não permite acessar a localização','error');return;}if(window.isSecureContext===false){toast('Abra o aplicativo pelo link seguro HTTPS para usar a localização','error');return;}if(iniciosGPSPendentes[num])return;
+  var p=encontrarProgPorNumero(num);if(!p)return;
+  if(!user||user.role!=='Motorista'||p.motorista!==user.nome){toast('Somente o motorista designado pode iniciar esta entrega','error');return;}
+  if(p.status!=='Programado'){toast('Esta entrega não está aguardando início','error');return;}
+  if(_programStatusSaveBusy[String(num)]||iniciosGPSPendentes[num])return;
+  if(!navigator.geolocation){toast('Este navegador não permite acessar a localização','error');return;}
+  if(window.isSecureContext===false){toast('Abra o aplicativo pelo link seguro HTTPS para usar a localização','error');return;}
   if(!confirm('Para iniciar, permita o acesso à localização do celular quando o navegador solicitar. A posição será atualizada a cada 5 minutos até Finalizar Entrega. Continuar?'))return;
-  iniciosGPSPendentes[num]=true;toast('Aguardando a permissão e a primeira posição do GPS…','info');
-  navigator.geolocation.getCurrentPosition(function(pos){delete iniciosGPSPendentes[num];var atual=encontrarProgPorNumero(num);if(!atual||atual.status!=='Programado')return;var inicioReal=new Date();atual.status='Em Rota';atual.horaInicio=inicioReal.toLocaleString('pt-BR');atual.inicioRealISO=inicioReal.toISOString();atual.fimRealISO=null;atual.duracaoEntregaMinutos=null;atual.localizacaoAtual=null;if(!atual.lidoPor)atual.lidoPor=[];if(atual.lidoPor.indexOf(user.nome)<0)atual.lidoPor.push(user.nome);gravarPosicaoLocal(num,pos);iniciarAtualizacoesLocalizacao(num);atualizarSino();toast('Entrega iniciada; localização compartilhada neste aparelho');abrirModalMot(num);renderMotorista();},function(err){delete iniciosGPSPendentes[num];var msg=err&&err.code===1?'A entrega não foi iniciada. Permita a localização nas configurações do navegador e tente novamente.':'A entrega não foi iniciada porque não consegui obter uma posição GPS. Confira o sinal e tente novamente.';toast(msg,'error');},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+  iniciosGPSPendentes[num]=true;toast('Obtendo a posição inicial do GPS...','info',true,false);
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var atual=encontrarProgPorNumero(num);if(!atual||atual.status!=='Programado'){delete iniciosGPSPendentes[num];return;}
+    var anterior=capturarCamposStatusEntrega(atual),inicioReal=new Date();
+    atual.status='Em Rota';atual.horaInicio=inicioReal.toLocaleString('pt-BR');atual.inicioRealISO=inicioReal.toISOString();atual.fimRealISO=null;atual.duracaoEntregaMinutos=null;atual.localizacaoAtual=null;
+    if(!atual.lidoPor)atual.lidoPor=[];if(atual.lidoPor.indexOf(user.nome)<0)atual.lidoPor.push(user.nome);
+    var desejado=capturarCamposStatusEntrega(atual);
+    var patch={status:'Em Rota',horaInicio:atual.horaInicio,inicioRealISO:atual.inicioRealISO,fimRealISO:null,duracaoEntregaMinutos:null,lidoPor:atual.lidoPor.slice()};
+    salvarStatusEntregaConfirmado(num,'iniciar',anterior,desejado,patch,function(){
+      delete iniciosGPSPendentes[num];gravarPosicaoLocal(num,pos);iniciarAtualizacoesLocalizacao(num);atualizarSino();abrirModalMot(num);renderMotorista();
+    },function(){delete iniciosGPSPendentes[num];renderMotorista();});
+  },function(err){
+    delete iniciosGPSPendentes[num];var msg=err&&err.code===1?'A entrega não foi iniciada. Permita a localização nas configurações do navegador e tente novamente.':'A entrega não foi iniciada porque não consegui obter uma posição GPS. Confira o sinal e tente novamente.';toast(msg,'error',true,false);
+  },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
-function motFinalizarModal(num){var inp=document.getElementById('recebedorMot');var quem=inp?inp.value.trim():'';if(!quem){toast('Informe quem recebeu','error');return;}pararAtualizacoesLocalizacao(num);for(var i=0;i<programacoes.length;i++){if(programacoes[i].numero===num){var fimReal=new Date();programacoes[i].status='Entregue';programacoes[i].horaFim=fimReal.toLocaleString('pt-BR');programacoes[i].fimRealISO=fimReal.toISOString();programacoes[i].quemRecebeu=quem;programacoes[i].localizacaoAtual=null;var inicioMs=programacoes[i].inicioRealISO?Date.parse(programacoes[i].inicioRealISO):NaN;var duracaoMs=fimReal.getTime()-inicioMs;programacoes[i].duracaoEntregaMinutos=isFinite(inicioMs)&&duracaoMs>=0?Math.round(duracaoMs/60000):null;break;}}saveDB();toast('Entrega finalizada!');fecharModalMot();renderMotorista();atualizarSino();}
+function motFinalizarModal(num){
+  var id=String(num||''),inp=document.getElementById('recebedorMot'),quem=inp?inp.value.trim():'';
+  if(!quem){toast('Informe quem recebeu','error');return;}
+  if(_programStatusSaveBusy[id])return;
+  var atual=encontrarProgPorNumero(id);if(!atual||atual.status!=='Em Rota'||!user||user.role!=='Motorista'||atual.motorista!==user.nome){toast('Esta entrega não está disponível para finalização neste acesso.','error');return;}
+  var anterior=capturarCamposStatusEntrega(atual);pararAtualizacoesLocalizacao(id);
+  var fimReal=new Date();atual.status='Entregue';atual.horaFim=fimReal.toLocaleString('pt-BR');atual.fimRealISO=fimReal.toISOString();atual.quemRecebeu=quem;atual.localizacaoAtual=null;
+  var inicioMs=atual.inicioRealISO?Date.parse(atual.inicioRealISO):NaN,duracaoMs=fimReal.getTime()-inicioMs;atual.duracaoEntregaMinutos=isFinite(inicioMs)&&duracaoMs>=0?Math.round(duracaoMs/60000):null;
+  var desejado=capturarCamposStatusEntrega(atual);
+  var patch={status:'Entregue',horaFim:atual.horaFim,fimRealISO:atual.fimRealISO,quemRecebeu:quem,duracaoEntregaMinutos:atual.duracaoEntregaMinutos};
+  salvarStatusEntregaConfirmado(id,'finalizar',anterior,desejado,patch,function(){saveDB();fecharModalMot();renderMotorista();atualizarSino();},function(){if((encontrarProgPorNumero(id)||{}).status==='Em Rota')iniciarAtualizacoesLocalizacao(id);});
+}
 function motFotoModal(num,idx,input){if(!input.files||!input.files[0])return;var file=input.files[0];if(input)input.value='';toast('Preparando a foto…','info');prepararFotoLocal(file,function(data,erro){if(erro){toast(erro,'error');return;}var p=encontrarProgPorNumero(num);if(!p){toast('Não encontrei esta entrega para salvar a foto.','error');return;}if(!Array.isArray(p.fotos))p.fotos=[];var anterior=p.fotos[idx];p.fotos[idx]=data;if(!saveDB()){if(anterior)p.fotos[idx]=anterior;else delete p.fotos[idx];abrirModalMot(num);renderMotorista();toast('O navegador não conseguiu guardar a foto neste aparelho. Libere espaço e tente novamente.','error');return;}abrirModalMot(num);renderMotorista();toast('Foto guardada neste aparelho. Toque nela para abrir, baixar ou compartilhar.','info');});}
 function motAbrirWaze(num){var p=encontrarProgPorNumero(num);if(!p)return;if(p.status!=='Em Rota'){toast('Inicie a entrega antes de abrir a navegação','error');return;}window.open('https://waze.com/ul?q='+encodeURIComponent(p.endereco),'_blank');}
 function motWhats(tel,num){var p=encontrarProgPorNumero(num);if(!p)return;var msg='Olá '+p.responsavel+', sou o motorista da Randstad e estou a caminho para entregar '+p.volumes+' volume(s)'+(p.numeroReq?' referente à requisição '+p.numeroReq:'')+'.';window.open('https://wa.me/55'+tel+'?text='+encodeURIComponent(msg),'_blank');}
@@ -2780,7 +2847,7 @@ function receiveCollection(name, snap) {
 }
 function scheduleSync(state) {
   if (!activeProfile || !dataReady) return Promise.reject(new Error('A sincronização ainda não está pronta.'));
-  if (applyingRemote) return Promise.resolve({ written: false });
+  if (applyingRemote) return Promise.resolve({ written: false, programWrittenIds: [] });
   latestState = jsonClone(state);
   const epoch = syncEpoch;
   return new Promise((resolve, reject) => {
@@ -2799,7 +2866,7 @@ function scheduleSync(state) {
           if (w.settled) return;
           w.settled = true;
           if (cancelled) w.reject(new Error('A sincronização foi interrompida.'));
-          else w.resolve({ written: written === true });
+          else w.resolve({ written: !!(written && written.written), programWrittenIds: written && Array.isArray(written.programWrittenIds) ? written.programWrittenIds : [] });
         });
         writeWaiters = writeWaiters.filter((w) => !w.settled);
       }, (err) => {
@@ -2916,6 +2983,50 @@ async function syncStateNow(state, epoch) {
   newFuelIds.forEach((id) => lastSubmittedFuel.add(id));
   return true;
 }
+async function saveProgramStatus(id, patch) {
+  const key = String(id || '');
+  if (!activeProfile || !dataReady || activeProfile.role !== 'Motorista') throw new Error('Este acesso não pode gravar o status da entrega.');
+  if (!key || !patch || typeof patch !== 'object') throw new Error('Identificação ou dados do status inválidos.');
+  const allowed = new Set(driverFields);
+  const update = {};
+  Object.keys(patch).forEach((field) => {
+    if (!allowed.has(field)) throw new Error('Campo de status não permitido: ' + field);
+    update[field] = cleanData(patch[field]);
+  });
+  if (!Object.keys(update).length) throw new Error('Não há campos de status para gravar.');
+  const epoch = syncEpoch;
+  if (writeTimer && latestState) await scheduleSync(latestState);
+  await writeChain;
+  const task = writeChain.then(async () => {
+    if (epoch !== syncEpoch || !activeProfile || activeProfile.role !== 'Motorista' || !dataReady) throw new Error('A sincronização foi interrompida.');
+    const currentMap = baseline.programacoes || new Map();
+    const current = currentMap.get(key);
+    if (!current || current.motorista !== activeProfile.nome) throw new Error('A entrega não pertence a este motorista ou não está carregada.');
+    const targetStatus = update.status;
+    const expectedServerStatus = targetStatus === 'Em Rota' ? 'Programado' : targetStatus === 'Entregue' ? 'Em Rota' : '';
+    if (!expectedServerStatus) throw new Error('A transição de status solicitada não é permitida.');
+    const ref = refPath('programacoes', key);
+    const serverProgram = await runTransaction(db, async (tx) => {
+      if (epoch !== syncEpoch || !activeProfile || activeProfile.role !== 'Motorista') throw new Error('A sincronização foi interrompida.');
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error('A entrega não existe mais na base compartilhada.');
+      const server = cleanData(snap.data());
+      if (server.motorista !== activeProfile.nome) throw new Error('A entrega não pertence a este motorista.');
+      if (server.status !== expectedServerStatus) throw new Error('O status da entrega mudou na base. Atualize a tela e tente novamente.');
+      tx.update(ref, update);
+      return Object.assign({}, server, update);
+    });
+    const latestMap = baseline.programacoes || new Map();
+    const latest = latestMap.get(key) || current;
+    latestMap.set(key, itemData('programacoes', serverProgram));
+    baseline.programacoes = latestMap;
+    remote.programacoes = (remote.programacoes || []).map((p) => String(p.numero) === key ? Object.assign({}, p, update) : p);
+    return { written: true, programId: key };
+  });
+  writeChain = task.then(() => undefined, () => undefined);
+  return task;
+}
+
 async function migrateLocalState(state) {
   if (!activeProfile || activeProfile.role !== 'Gestor' || !dataReady) throw new Error('Somente o gestor pode migrar dados locais.');
   const epoch = syncEpoch;
@@ -3003,6 +3114,7 @@ window.programFirebase = {
   startSync,
   stopSync,
   syncState: scheduleSync,
+  saveProgramStatus,
   migrateLocalState,
   sendPasswordReset: (email) => sendPasswordResetEmail(auth, email.trim().toLowerCase())
 };
