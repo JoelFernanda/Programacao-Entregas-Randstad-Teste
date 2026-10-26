@@ -2492,6 +2492,42 @@ function metricasAbastecimentos(lista){
   return m;
 }
 function atualizarFiltrosAbastecimento(){var x=document.getElementById('abastFiltroInicio'),y=document.getElementById('abastFiltroFim'),z=document.getElementById('abastFiltroVeiculo');abastFiltroInicio=x?x.value:'';abastFiltroFim=y?y.value:'';abastFiltroVeiculo=z?z.value:'';renderAbastecimentoGestor();}
+function editarAbastecimentoGestor(id){
+  if(!user||user.role!=='Gestor'){toast('Somente o gestor pode editar abastecimentos.','error');return;}
+  var r=abastecimentos.filter(function(a){return String(a.id)===String(id);})[0];
+  if(!r){toast('Não encontrei esse abastecimento na lista atual. Atualize a tela e tente novamente.','error');return;}
+  var modal=document.getElementById('modalEditarAbastecimento');
+  if(!modal){modal=document.createElement('div');modal.id='modalEditarAbastecimento';modal.className='modal-overlay';document.body.appendChild(modal);}
+  modal.innerHTML='<div class="modal" style="max-width:760px"><h3>Editar abastecimento</h3><p class="sub">Altere os dados incorretos. Quem registrou será preservado; total, intervalo e consumo serão recalculados.</p><div class="grid grid-2">'
+    +'<div class="field"><label>Data *</label><input class="input" type="date" id="editAbastData" value="'+esc(r.data||'')+'"></div>'
+    +'<div class="field"><label>Veículo *</label><input class="input" id="editAbastVeiculo" value="'+esc(r.veiculo||'')+'"></div>'
+    +'<div class="field"><label>Placa *</label><input class="input" id="editAbastPlaca" value="'+esc(r.placa||'')+'"></div>'
+    +'<div class="field"><label>Motorista *</label><input class="input" id="editAbastMotorista" value="'+esc(r.motorista||'')+'"></div>'
+    +'<div class="field"><label>Odômetro (km) *</label><input class="input" type="number" min="0" step="1" id="editAbastKm" value="'+esc(r.odometro==null?'':r.odometro)+'"></div>'
+    +'<div class="field"><label>Combustível *</label><select class="input" id="editAbastCombustivel"><option'+(r.combustivel==='Etanol'?' selected':'')+'>Etanol</option><option'+(r.combustivel==='Diesel'?' selected':'')+'>Diesel</option><option'+(r.combustivel==='Gasolina'?' selected':'')+'>Gasolina</option></select></div>'
+    +'<div class="field"><label>Nº do recibo *</label><input class="input" id="editAbastRecibo" value="'+esc(r.recibo||'')+'"></div>'
+    +'<div class="field"><label>Litros *</label><input class="input" type="number" min="0.01" step="0.001" id="editAbastLitros" value="'+esc(r.litros==null?'':r.litros)+'"></div>'
+    +'<div class="field"><label>Valor por litro (R$) *</label><input class="input" type="number" min="0.01" step="0.001" id="editAbastPreco" value="'+esc(r.valorLitro==null?'':r.valorLitro)+'"></div>'
+    +'<div class="field"><label>Forma de pagamento *</label><select class="input" id="editAbastPagamento"><option'+(r.pagamento==='Cartão Empresarial'?' selected':'')+'>Cartão Empresarial</option><option'+(r.pagamento==='VR Abastecimento'?' selected':'')+'>VR Abastecimento</option><option'+(r.pagamento==='Débito da Empresa'?' selected':'')+'>Débito da Empresa</option><option'+(r.pagamento==='Pago do bolso'?' selected':'')+'>Pago do bolso</option></select></div>'
+    +'</div><div style="margin-top:18px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" onclick="fecharEdicaoAbastecimento()">Cancelar</button><button class="btn ok" onclick="salvarEdicaoAbastecimento(\''+esc(r.id)+'\')">Salvar correção</button></div></div>';
+  modal.classList.add('active');
+}
+function fecharEdicaoAbastecimento(){var m=document.getElementById('modalEditarAbastecimento');if(m)m.classList.remove('active');}
+async function salvarEdicaoAbastecimento(id){
+  if(!user||user.role!=='Gestor'){toast('Somente o gestor pode editar abastecimentos.','error');return;}
+  var original=abastecimentos.filter(function(a){return String(a.id)===String(id);})[0];if(!original){toast('Registro não encontrado.','error');return;}
+  var km=Number(document.getElementById('editAbastKm').value),litros=Number(document.getElementById('editAbastLitros').value),preco=Number(document.getElementById('editAbastPreco').value);
+  var data=document.getElementById('editAbastData').value,veiculo=document.getElementById('editAbastVeiculo').value.trim(),placa=document.getElementById('editAbastPlaca').value.trim().toUpperCase(),motorista=document.getElementById('editAbastMotorista').value.trim(),combustivel=document.getElementById('editAbastCombustivel').value,recibo=document.getElementById('editAbastRecibo').value.trim(),pagamento=document.getElementById('editAbastPagamento').value;
+  if(!data||!veiculo||!placa||!motorista||!Number.isSafeInteger(km)||km<0||!combustivel||!recibo||!Number.isFinite(litros)||litros<=0||!Number.isFinite(preco)||preco<=0||!pagamento){toast('Confira os campos: todos são obrigatórios e os valores precisam ser válidos.','error');return;}
+  var mudouVeiculo=normalizarCad(veiculo)!==normalizarCad(original.veiculo||'')||placa.replace(/[^A-Z0-9]/g,'')!==String(original.placa||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  var veiculoCadastro=veiculosAbastecimento.filter(function(x){return normalizarCad(x.nome)===normalizarCad(veiculo)&&String(x.placa||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===placa.replace(/[^A-Z0-9]/g,'');})[0];
+  if(mudouVeiculo&&!veiculoCadastro){toast('Para trocar o veículo ou a placa, escolha um veículo que já esteja cadastrado na frota.','error');return;}
+  var patch={data:data,veiculo:veiculo,placa:placa,motorista:motorista,odometro:km,combustivel:combustivel,recibo:recibo,litros:litros,valorLitro:preco,total:Math.round(litros*preco*100)/100,pagamento:pagamento};
+  if(veiculoCadastro)patch.veiculoId=veiculoCadastro.id;
+  if(!window.confirm('Confirma salvar as correções deste abastecimento de '+fmtDataBR(original.data)+' — '+(original.motorista||'motorista não informado')+'?'))return;
+  try{toast('Gravando correções na base compartilhada...','info',true,false);var result=await window.programFirebase.updateFuelRecord(original.id,patch);if(!result||result.written!==true||String(result.fuelId)!==String(original.id))throw new Error('O Firebase não confirmou as alterações.');fecharEdicaoAbastecimento();toast('Abastecimento corrigido e confirmado na base compartilhada.','success',true,false);renderAbastecimentoGestor();}
+  catch(err){console.error('Falha ao editar abastecimento:',err);toast('Não recebi confirmação da correção. Confira o registro antes de tentar novamente.','error',true,false);}
+}
 function exportarRelatorioAbastecimento(){
   var lista=filtroAbastecimentos();var linhas=lista.map(function(a){return {'Data':a.data||'','Veículo':a.veiculo||'','Placa':a.placa||'','Motorista':a.motorista||'','Registrado por':a.registradoPor||'','Odômetro (km)':a.odometro,'Km desde abastecimento anterior':a.kmIntervalo==null?'':a.kmIntervalo,'Consumo (km/L)':a.consumoIntervalo==null?'':Math.round(a.consumoIntervalo*100)/100,'Combustível':a.combustivel||'','Nº recibo':a.recibo||'','Litros':a.litros,'Valor por litro':a.valorLitro,'Total':a.total,'Pagamento':a.pagamento||''};});
   if(!linhas.length){toast('Não há registros para exportar','error');return;}
@@ -2589,8 +2625,8 @@ function renderAbastecimentoGestor(){
   var porVeiculo=Object.keys(m.porVeiculo).map(function(k){return m.porVeiculo[k];});
   var rowsV='';porVeiculo.sort(function(a,b){return a.veiculo.localeCompare(b.veiculo);}).forEach(function(v){rowsV+='<tr><td>'+esc(v.veiculo)+'</td><td>'+esc(v.placa)+'</td><td>'+Math.round(v.km).toLocaleString('pt-BR')+' km</td><td>'+v.litros.toLocaleString('pt-BR',{maximumFractionDigits:2})+' L</td><td>'+dinheiroAbastecimento(v.custo)+'</td><td>'+dinheiroAbastecimento(v.litros?v.custo/v.litros:0)+'</td><td>'+ (v.litrosConsumo?(v.km/v.litrosConsumo).toLocaleString('pt-BR',{maximumFractionDigits:2})+' km/L':'—')+'</td></tr>';});
   if(!rowsV)rowsV='<tr><td colspan="7" class="empty">Sem abastecimentos no período selecionado.</td></tr>';
-  var rows='';lista.forEach(function(a){rows+='<tr><td>'+fmtDataBR(a.data)+'</td><td>'+esc(a.veiculo||'-')+'<br><small>'+esc(a.placa||'-')+'</small></td><td>'+esc(a.motorista||'-')+'</td><td>'+esc(a.registradoPor||'-')+'</td><td>'+Number(a.odometro||0).toLocaleString('pt-BR')+'</td><td>'+esc(a.combustivel||'-')+'</td><td>'+esc(a.recibo||'-')+'</td><td>'+Number(a.litros||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td><td>'+dinheiroAbastecimento(a.valorLitro)+'</td><td>'+dinheiroAbastecimento(a.total)+'</td><td>'+esc(a.pagamento||'-')+'</td><td>'+ (a.kmIntervalo==null?'—':Math.round(a.kmIntervalo).toLocaleString('pt-BR')+' km')+'</td><td>'+ (a.consumoIntervalo==null?'—':a.consumoIntervalo.toLocaleString('pt-BR',{maximumFractionDigits:2})+' km/L')+'</td></tr>';});
-  if(!rows)rows='<tr><td colspan="13" class="empty">Nenhum abastecimento no período.</td></tr>';
+  var rows='';lista.forEach(function(a){rows+='<tr><td>'+fmtDataBR(a.data)+'</td><td>'+esc(a.veiculo||'-')+'<br><small>'+esc(a.placa||'-')+'</small></td><td>'+esc(a.motorista||'-')+'</td><td>'+esc(a.registradoPor||'-')+'</td><td>'+Number(a.odometro||0).toLocaleString('pt-BR')+'</td><td>'+esc(a.combustivel||'-')+'</td><td>'+esc(a.recibo||'-')+'</td><td>'+Number(a.litros||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+'</td><td>'+dinheiroAbastecimento(a.valorLitro)+'</td><td>'+dinheiroAbastecimento(a.total)+'</td><td>'+esc(a.pagamento||'-')+'</td><td>'+ (a.kmIntervalo==null?'—':Math.round(a.kmIntervalo).toLocaleString('pt-BR')+' km')+'</td><td>'+ (a.consumoIntervalo==null?'—':a.consumoIntervalo.toLocaleString('pt-BR',{maximumFractionDigits:2})+' km/L')+'</td><td><button class="btn ghost sm" onclick="editarAbastecimentoGestor(\''+esc(a.id)+'\')">Editar</button></td></tr>';});
+  if(!rows)rows='<tr><td colspan="14" class="empty">Nenhum abastecimento no período.</td></tr>';
   var veiculosHtml='';veiculosAbastecimento.forEach(function(v){veiculosHtml+='<tr><td>'+esc(v.nome)+'</td><td>'+esc(v.placa)+'</td><td>'+(v.ativo===false?'Inativo':'Ativo')+'</td><td><button class="btn ghost sm" onclick="alternarVeiculoAbastecimento(\''+esc(v.id)+'\')">'+(v.ativo===false?'Ativar':'Desativar')+'</button></td></tr>';});
   if(!veiculosHtml)veiculosHtml='<tr><td colspan="4" class="empty">Cadastre o primeiro veículo abaixo.</td></tr>';
   var motoristasHtml=motoristasAbastecimento.map(function(x){return '<span class="pill programado" style="margin:3px">'+esc(x)+'</span>';}).join('');
@@ -2598,7 +2634,7 @@ function renderAbastecimentoGestor(){
     +renderPreviaImportacaoAbastecimento()
     +'<div class="card"><h2>Indicadores</h2><div class="row" style="margin-bottom:12px"><div class="field col"><label>De</label><input class="input" type="date" id="abastFiltroInicio" value="'+esc(abastFiltroInicio)+'" onchange="atualizarFiltrosAbastecimento()"></div><div class="field col"><label>Até</label><input class="input" type="date" id="abastFiltroFim" value="'+esc(abastFiltroFim)+'" onchange="atualizarFiltrosAbastecimento()"></div><div class="field col"><label>Veículo</label><select class="input" id="abastFiltroVeiculo" onchange="atualizarFiltrosAbastecimento()">'+opts+'</select></div><div class="col-fix"><button class="btn ghost" onclick="abastFiltroInicio=\'\';abastFiltroFim=\'\';abastFiltroVeiculo=\'\';renderAbastecimentoGestor()">Limpar filtros</button></div></div>'+kpis+'</div>'
     +'<div class="card"><h2>Resumo por veículo</h2><div style="overflow-x:auto"><table><thead><tr><th>Veículo</th><th>Placa</th><th>Km rodados</th><th>Litros</th><th>Custo</th><th>Preço médio/L</th><th>Consumo médio</th></tr></thead><tbody>'+rowsV+'</tbody></table></div></div>'
-    +'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2>Registros e relatório</h2><div class="sub">'+lista.length+' registro(s) no filtro atual.</div></div><button class="btn blue" onclick="exportarRelatorioAbastecimento()">Exportar para Excel</button></div><div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Veículo / placa</th><th>Motorista</th><th>Registrado por</th><th>Odômetro</th><th>Combustível</th><th>Recibo</th><th>Litros</th><th>Preço/L</th><th>Total</th><th>Pagamento</th><th>Km intervalo</th><th>Km/L</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'
+    +'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2>Registros e relatório</h2><div class="sub">'+lista.length+' registro(s) no filtro atual.</div></div><button class="btn blue" onclick="exportarRelatorioAbastecimento()">Exportar para Excel</button></div><div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Veículo / placa</th><th>Motorista</th><th>Registrado por</th><th>Odômetro</th><th>Combustível</th><th>Recibo</th><th>Litros</th><th>Preço/L</th><th>Total</th><th>Pagamento</th><th>Km intervalo</th><th>Km/L</th><th>Ação</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'
     +'<div class="card"><h2>Cadastros da frota</h2><div class="grid grid-2"><div class="field"><label>Nome do veículo *</label><input class="input" id="novoAbastVeiculo" placeholder="Ex.: Fiorino 1"></div><div class="field"><label>Placa *</label><input class="input" id="novaAbastPlaca" maxlength="8" placeholder="ABC1D23"></div></div><button class="btn ok" onclick="adicionarVeiculoAbastecimento()">Adicionar veículo</button><div style="overflow-x:auto;margin-top:14px"><table><thead><tr><th>Veículo</th><th>Placa</th><th>Status</th><th>Ação</th></tr></thead><tbody>'+veiculosHtml+'</tbody></table></div><h2 style="margin-top:20px">Motoristas cadastrados</h2><div>'+motoristasHtml+'</div><div class="row" style="margin-top:12px"><div class="field col"><label>Novo motorista</label><input class="input" id="novoAbastMotorista" placeholder="Nome do motorista"></div><div class="col-fix"><button class="btn ghost" onclick="adicionarMotoristaAbastecimento()">Adicionar motorista</button></div></div></div>'
     +montarFormularioAbastecimento();
 }
@@ -2676,7 +2712,7 @@ import {
   sendPasswordResetEmail
 } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
 import {
-  getFirestore, collection, doc, getDoc, onSnapshot, query, where,
+  getFirestore, collection, doc, getDoc, updateDoc, onSnapshot, query, where,
   writeBatch, runTransaction
 } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
@@ -2998,6 +3034,30 @@ async function syncStateNow(state, epoch) {
   newFuelIds.forEach((id) => lastSubmittedFuel.add(id));
   return true;
 }
+async function updateFuelRecord(id, patch) {
+  if (!activeProfile || !dataReady || activeProfile.role !== 'Gestor') throw new Error('Somente o gestor pode editar abastecimentos.');
+  if (!patch || typeof patch !== 'object') throw new Error('Dados de correção inválidos.');
+  const allowed = new Set(['data','veiculoId','veiculo','placa','motorista','odometro','combustivel','recibo','litros','valorLitro','total','pagamento']);
+  const fields = Object.keys(patch);
+  if (!fields.length || fields.some((k) => !allowed.has(k))) throw new Error('A correção contém campos não permitidos.');
+  if (Object.prototype.hasOwnProperty.call(patch,'odometro') && (!Number.isSafeInteger(patch.odometro) || patch.odometro < 0)) throw new Error('Odômetro inválido.');
+  if (Object.prototype.hasOwnProperty.call(patch,'litros') && (!Number.isFinite(patch.litros) || patch.litros <= 0)) throw new Error('Quantidade de litros inválida.');
+  if (Object.prototype.hasOwnProperty.call(patch,'valorLitro') && (!Number.isFinite(patch.valorLitro) || patch.valorLitro <= 0)) throw new Error('Preço por litro inválido.');
+  const key = String(id || '');
+  if (!key) throw new Error('Identificação do abastecimento inválida.');
+  const ref = refPath('abastecimentos', key);
+  const before = await getDoc(ref);
+  if (!before.exists()) throw new Error('O abastecimento não existe mais na base compartilhada.');
+  await updateDoc(ref, patch);
+  const after = await getDoc(ref);
+  const saved = after.exists() ? after.data() : null;
+  if (!saved || fields.some((k) => !equal(saved[k], patch[k]))) throw new Error('O Firebase não confirmou todos os campos corrigidos.');
+  const updated = Object.assign({}, saved, { id: key });
+  remote.abastecimentos = (remote.abastecimentos || []).map((x) => String(x.id) === key ? updated : x);
+  baseline.abastecimentos = dataMap('abastecimentos', remote.abastecimentos);
+  publish();
+  return { written: true, fuelId: key };
+}
 async function saveFuelRecord(record) {
   if (!activeProfile || !dataReady || activeProfile.role !== 'Motorista' || activeProfile.canFuel !== true) throw new Error('Este perfil não está autorizado a registrar abastecimentos.');
   if (!record || !record.id || record.registradoPorLogin !== activeProfile.login || record.registradoPor !== activeProfile.nome) throw new Error('O abastecimento não corresponde ao motorista autenticado.');
@@ -3152,6 +3212,7 @@ window.programFirebase = {
   syncState: scheduleSync,
   saveProgramStatus,
   saveFuelRecord,
+  updateFuelRecord,
   migrateLocalState,
   sendPasswordReset: (email) => sendPasswordResetEmail(auth, email.trim().toLowerCase())
 };
