@@ -1406,6 +1406,8 @@ function mostrarLoginStatus(mensagem){
   if(box){box.classList.toggle('active',!!mensagem);box.setAttribute('aria-busy',mensagem?'true':'false');}
   if(button){button.disabled=!!mensagem;button.textContent=mensagem?'Entrando...':'Entrar';}
 }
+function erroFirebaseVisivel(err){var codigo=String(err&&err.code||'erro');var detalhe=String(err&&err.message||'sem detalhe').replace(/[\r\n]+/g,' ').slice(0,180);return 'Falha ao carregar ('+codigo+'): '+detalhe;}
+function erroFirebaseVisivel(err){var codigo=String(err&&err.code||'erro');var detalhe=String(err&&err.message||'sem detalhe').replace(/[\r\n]+/g,' ').slice(0,180);return 'Falha ao carregar ('+codigo+'): '+detalhe;}
 function mostrarLoginEntrada(mensagem,mostrarRetry){
   mostrarLoginStatus('');
   ocultarSplashEntrada();
@@ -1419,7 +1421,7 @@ async function reintentarEntrada(){
   try{
     var api=await aguardarProgramFirebase(),atual=await api.waitForAuth();
     if(atual)await iniciarSessaoFirebase(atual,inline);else if(inline)mostrarLoginEntrada('Conexão verificada. Toque em Entrar para tentar novamente.',false);else{ocultarSplashEntrada();await fazerLogin();}
-  }catch(err){console.error(err);mostrarLoginEntrada('Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.',true);}
+  }catch(err){console.error(err);mostrarLoginEntrada(erroFirebaseVisivel(err),true);}
 }
 async function iniciarSessaoFirebase(firebaseUser,manterLoginVisivel){
   var api=await aguardarProgramFirebase();
@@ -1447,7 +1449,7 @@ async function fazerLogin(){
     console.error(err);
     var mensagem=(err&&err.code==='auth/invalid-credential')?'E-mail ou senha inválidos.':(err&&err.code==='auth/too-many-requests')?'Muitas tentativas. Aguarde e tente novamente.':(err&&err.message&&err.message.indexOf('Seu acesso')>=0)?err.message:'Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.';
     var retry=!(err&&(err.code==='auth/invalid-credential'||err.code==='auth/too-many-requests'))&&!(err&&err.message&&err.message.indexOf('Seu acesso')>=0);
-    mostrarLoginEntrada(mensagem,retry);
+    mostrarLoginEntrada(mensagem==='Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.'?erroFirebaseVisivel(err):mensagem,retry);
   }
 } async function enviarLinkSenha(){
   var email=document.getElementById('loginUser').value.trim().toLowerCase();var erro=document.getElementById('loginErro');
@@ -2662,7 +2664,7 @@ aplicarTemaSistema();
     try{
       var api=await aguardarProgramFirebase();var atual=await api.waitForAuth();
       if(atual)await iniciarSessaoFirebase(atual);else mostrarLoginEntrada('',false);
-    }catch(err){console.error(err);mostrarLoginEntrada('Não foi possível carregar os dados compartilhados. Verifique sua conexão e tente novamente.',true);}
+    }catch(err){console.error(err);mostrarLoginEntrada(erroFirebaseVisivel(err),true);}
   })();
 })();
 </script>
