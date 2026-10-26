@@ -2782,7 +2782,7 @@ function readCollections(profile) {
 function fuelReferenceAllowed(profile) { return profile.role === 'Gestor' || profile.canFuel === true; }
 function requiredCollections(profile) {
   const names = readCollections(profile).filter((name) => name !== 'retornos' && !(profile.role === 'Motorista' && name === 'abastecimentos'));
-  if (fuelReferenceAllowed(profile)) names.push('veiculosAbastecimento','motoristasAbastecimento');
+  if (fuelReferenceAllowed(profile) && profile.role !== 'Motorista') names.push('veiculosAbastecimento','motoristasAbastecimento');
   return names;
 }
 function applyTrackingToPrograms() {
@@ -3098,8 +3098,9 @@ async function startSync(profile) {
     sub('regioes', collection(db, 'regioes'));
   }
   if (fuelReferenceAllowed(profile)) {
-    sub('veiculosAbastecimento', collection(db, 'veiculosAbastecimento'));
-    sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'));
+    const optionalFuelRefs = profile.role === 'Motorista';
+    sub('veiculosAbastecimento', collection(db, 'veiculosAbastecimento'), optionalFuelRefs);
+    sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'), optionalFuelRefs);
   }
   if (profile.role === 'Gestor') sub('abastecimentos', collection(db, 'abastecimentos'));
   else if (profile.role === 'Motorista' && profile.canFuel === true) sub('abastecimentos', query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.login)), true);
