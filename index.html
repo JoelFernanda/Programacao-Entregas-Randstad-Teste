@@ -1430,7 +1430,7 @@ async function iniciarSessaoFirebase(firebaseUser,manterLoginVisivel){
   try{
     var perfil=await api.getProfile(firebaseUser);
     var candidato=perfil.role==='Gestor'?(legadoLocalPendente||capturarDadosLegados()):null;
-    user={uid:perfil.uid,email:perfil.email,user:perfil.login||perfil.username||perfil.email,nome:perfil.nome||perfil.email,role:perfil.role,canFuel:perfil.canFuel===true};
+    user={uid:perfil.uid,email:perfil.email,login:perfil.login||perfil.username||perfil.email,user:perfil.login||perfil.username||perfil.email,nome:perfil.nome||perfil.email,role:perfil.role,canFuel:perfil.canFuel===true};
     carregarFotosLocaisUsuario(perfil.uid);sincronizacaoFirebaseAtiva=false;
     await api.startSync(user);sincronizacaoFirebaseAtiva=true;atualizarIndicadorSincronizacao('synced');
     if(candidato)await oferecerMigracaoLocal(candidato);
@@ -3105,7 +3105,7 @@ async function startSync(profile) {
     sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'), optionalFuelRefs);
   }
   if (profile.role === 'Gestor') sub('abastecimentos', collection(db, 'abastecimentos'));
-  else if (profile.role === 'Motorista' && profile.canFuel === true) sub('abastecimentos', query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.user)), true);
+  else if (profile.role === 'Motorista' && profile.canFuel === true) sub('abastecimentos', query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.login)), true);
   if (canMonitorProfile(profile)) sub('rastreamento', collection(db, 'rastreamento'));
   if (!required.length) throw new Error('Nenhuma coleção autorizada para este perfil.');
   let timeoutId;
