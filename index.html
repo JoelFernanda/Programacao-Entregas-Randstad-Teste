@@ -1072,9 +1072,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 })();
 
 /* ============ CONSTANTES ============ */
-var MOTORISTAS=['Alexandre','Roger','Robson','Joel'];
-var CARROS=[{nome:'Fiorino 1',motorista:'Alexandre',placa:'CUH 3H75'},{nome:'Fiorino 2',motorista:'Roger',placa:'TZG 9I75'}];
-var TIPOS=['Entrega','Coleta','Coleta e Entrega'];
+var MOTORISTAS=['Alexandre','Roger','Robson','Joel','Outro'];
+var CARROS=[{nome:'Fiorino 1',motorista:'Alexandre',placa:'CUH 3H75'},{nome:'Fiorino 2',motorista:'Roger',placa:'TZG 9I75'},{nome:'Uber Carro',motorista:''},{nome:'Uber Moto',motorista:''},{nome:'Uber Utilitário',motorista:''}];
+var TIPOS=['Entrega','Coleta','Coleta e Entrega','Retirada'];
 var DIAS_SEMANA=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 var REGIOES_DEFAULT=['Sumaré','Campinas','Cajamar','Franco da Rocha','Santana de Parnaíba','Barueri','Guarulhos','Embu das Artes','Alphaville','Casa Verde'];
 
@@ -1103,6 +1103,7 @@ var ICO={
 var programacoes=[], clientes=[], regioes=REGIOES_DEFAULT.slice();
 var abastecimentos=[], veiculosAbastecimento=[], motoristasAbastecimento=['Joel','Robson','Alexandre','Roger','Fabio'];
 var abastFiltroInicio='',abastFiltroFim='',abastFiltroVeiculo='';
+var abastMotoristaMes='';
 var abastImportacaoPendente=null;
 var user=null, abaAtual=null;
 var tvClockInterval=null;
@@ -1298,6 +1299,8 @@ function receberEstadoFirebase(s){
   abastecimentos=s.abastecimentos||[];veiculosAbastecimento=s.veiculosAbastecimento||[];
   motoristasAbastecimento=s.motoristasAbastecimento&&s.motoristasAbastecimento.length?s.motoristasAbastecimento:['Joel','Robson','Alexandre','Roger','Fabio'];
   salvarDBLocal();
+  if(user&&abaAtual==='abastecimento'&&user.role!=='Gestor'){var box=document.getElementById('abastHistoricoMotorista');if(box)box.innerHTML=montarHistoricoAbastecimentoMotorista();}
+  if(user&&abaAtual==='abastecimento'&&user.role!=='Gestor'){var historico=document.getElementById('abastHistoricoMotorista');if(historico)historico.innerHTML=montarHistoricoAbastecimentoMotorista();}
   if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;if(preservarTela){firebaseSnapshotRenderPendente=true;}else{firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);}checarNovasEntregas();}
 }
 window.receiveProgramFirebaseSnapshot=receberEstadoFirebase;
@@ -1659,7 +1662,7 @@ function onMudarCadProg(){
     document.getElementById('progCliente').value='';
   }
 }
-function onMudarMotorista(){var mot=document.getElementById('progMotorista').value;var carro=null;for(var i=0;i<CARROS.length;i++){if(CARROS[i].motorista===mot){carro=CARROS[i];break;}}if(carro)document.getElementById('progCarro').value=carro.nome;}
+function onMudarMotorista(){var mot=document.getElementById('progMotorista').value;var carro=null;for(var i=0;i<CARROS.length;i++){if(CARROS[i].motorista===mot&&CARROS[i].motorista){carro=CARROS[i];break;}}var campoCarro=document.getElementById('progCarro');if(mot==='Outro'){campoCarro.value='';return;}if(carro)campoCarro.value=carro.nome;}
 function salvarProg(){
   var numeroReq=document.getElementById('progNumReq').value.trim();
   var cad=document.getElementById('progCad').value;
@@ -2430,29 +2433,38 @@ function montarFormularioAbastecimento(){
     +'<div class="field"><label>Valor por litro (R$) *</label><input class="input" type="number" min="0.01" step="0.001" id="abastValorLitro" inputmode="decimal" oninput="calcularTotalAbastecimento()"></div>'
     +'<div class="field"><label>Total do abastecimento</label><input class="input" id="abastTotal" value="R$ 0,00" readonly></div>'
     +'<div class="field"><label>Forma de pagamento *</label><select class="input" id="abastPagamento"><option value="">-- Selecione --</option><option>Cartão Empresarial</option><option>VR Abastecimento</option><option>Débito da Empresa</option><option>Pago do bolso</option></select></div>'
-    +'</div><div style="margin-top:12px"><button class="btn ok" onclick="salvarAbastecimento()">Salvar abastecimento</button></div></div>';
+    +'</div><div style="margin-top:12px"><button class="btn ok" id="btnSalvarAbastecimento" onclick="salvarAbastecimento()">Salvar abastecimento</button></div></div>';
 }
+function montarHistoricoAbastecimentoMotorista(){
+  if(!abastMotoristaMes)abastMotoristaMes=dataHojeAbastecimento().slice(0,7);
+  var login=String(user&&user.user||'').trim().toLowerCase();
+  var lista=abastecimentos.filter(function(a){return String(a.registradoPorLogin||'').trim().toLowerCase()===login&&String(a.data||'').slice(0,7)===abastMotoristaMes;}).slice().sort(function(a,b){return String(b.data||'').localeCompare(String(a.data||''))||String(b.criadoEm||'').localeCompare(String(a.criadoEm||''));});
+  var rows=lista.map(function(a){return '<tr><td>'+fmtDataBR(a.data)+'</td><td>'+esc(a.veiculo||'-')+'<br><small>'+esc(a.placa||'-')+'</small></td><td>'+Number(a.odometro||0).toLocaleString('pt-BR')+'</td><td>'+Number(a.litros||0).toLocaleString('pt-BR',{maximumFractionDigits:2})+' L</td><td>'+dinheiroAbastecimento(a.total)+'</td><td>'+esc(a.pagamento||'-')+'</td></tr>';}).join('');
+  if(!rows)rows='<tr><td colspan="6" class="empty">Nenhum abastecimento seu neste mês.</td></tr>';
+  return '<div class="card" style="margin-top:16px"><div class="row" style="align-items:end;justify-content:space-between"><div><h2>Meus abastecimentos</h2><p class="sub">Somente lançamentos feitos pela sua conta.</p></div><div class="field"><label>Mês</label><input class="input" type="month" id="abastMotoristaMes" value="'+esc(abastMotoristaMes)+'" onchange="atualizarHistoricoAbastecimentoMotorista()"></div></div><div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Veículo / placa</th><th>Odômetro</th><th>Litros</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+function atualizarHistoricoAbastecimentoMotorista(){var f=document.getElementById('abastMotoristaMes');if(f&&f.value)abastMotoristaMes=f.value;var box=document.getElementById('abastHistoricoMotorista');if(box)box.innerHTML=montarHistoricoAbastecimentoMotorista();}
 function renderFormularioAbastecimento(){
-  document.getElementById('conteudo').innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' Abastecimento</h1><p>Registre o abastecimento da frota.</p></div><div class="info-box info"><div>O lançamento é enviado à base compartilhada. O painel completo de relatórios fica restrito ao gestor.</div></div>'+montarFormularioAbastecimento();
+  document.getElementById('conteudo').innerHTML='<div class="page-head"><h1>'+rocketIcon('md')+' Abastecimento</h1><p>Registre o abastecimento da frota.</p></div><div class="info-box info"><div>O lançamento é enviado à base compartilhada. Você verá abaixo somente os abastecimentos feitos pela sua conta; o painel completo continua restrito ao gestor.</div></div>'+montarFormularioAbastecimento()+'<div id="abastHistoricoMotorista">'+montarHistoricoAbastecimentoMotorista()+'</div>';
 }
 function onMudarVeiculoAbastecimento(){var id=document.getElementById('abastVeiculo').value;var v=veiculosAbastecimento.filter(function(x){return x.id===id;})[0];document.getElementById('abastPlaca').value=v?v.placa:'';}
 function calcularTotalAbastecimento(){var litros=numeroAbastecimento('abastLitros'),preco=numeroAbastecimento('abastValorLitro');var total=Math.round(litros*preco*100)/100;var el=document.getElementById('abastTotal');if(el)el.value=dinheiroAbastecimento(total);}
-function salvarAbastecimento(){
-  var veiculoId=document.getElementById('abastVeiculo').value;
-  var v=veiculosAbastecimento.filter(function(x){return x.id===veiculoId&&x.ativo!==false;})[0];
-  var data=document.getElementById('abastData').value;
-  var motorista=document.getElementById('abastMotorista').value;
-  var km=numeroAbastecimento('abastKm');
-  var combustivel=document.getElementById('abastCombustivel').value;
-  var recibo=document.getElementById('abastRecibo').value.trim();
-  var litros=numeroAbastecimento('abastLitros');
-  var preco=numeroAbastecimento('abastValorLitro');
-  var pagamento=document.getElementById('abastPagamento').value;
+var _abastSalvando=false;
+async function salvarAbastecimento(){
+  if(_abastSalvando)return;
+  var veiculoId=document.getElementById('abastVeiculo').value;var v=veiculosAbastecimento.filter(function(x){return x.id===veiculoId&&x.ativo!==false;})[0];
+  var data=document.getElementById('abastData').value;var motorista=document.getElementById('abastMotorista').value;var km=numeroAbastecimento('abastKm');
+  var combustivel=document.getElementById('abastCombustivel').value;var recibo=document.getElementById('abastRecibo').value.trim();
+  var litros=numeroAbastecimento('abastLitros');var preco=numeroAbastecimento('abastValorLitro');var pagamento=document.getElementById('abastPagamento').value;
   if(!data||!v||!motorista||!combustivel||!recibo||km<0||!litros||!preco||!pagamento){toast('Preencha todos os campos obrigatórios','error');return;}
-  var total=Math.round(litros*preco*100)/100;
-  abastecimentos.push({id:'AB-'+Date.now()+'-'+Math.floor(Math.random()*1000),data:data,veiculoId:v.id,veiculo:v.nome,placa:v.placa,motorista:motorista,registradoPor:user.nome,registradoPorLogin:user.user,odometro:km,combustivel:combustivel,recibo:recibo,litros:litros,valorLitro:preco,total:total,pagamento:pagamento,criadoEm:new Date().toISOString()});
-  saveDB();toast('Abastecimento salvo');renderAbastecimento();
+  if(!window.programFirebase||typeof window.programFirebase.saveFuelRecord!=='function'){toast('A gravação confirmada ainda não está disponível. Nenhum registro foi confirmado.','error',true,false);return;}
+  var registro={id:'AB-'+Date.now()+'-'+Math.floor(Math.random()*1000000),data:data,veiculoId:v.id,veiculo:v.nome,placa:v.placa,motorista:motorista,registradoPor:user.nome,registradoPorLogin:user.user,odometro:km,combustivel:combustivel,recibo:recibo,litros:litros,valorLitro:preco,total:Math.round(litros*preco*100)/100,pagamento:pagamento,criadoEm:new Date().toISOString()};
+  _abastSalvando=true;var btn=document.getElementById('btnSalvarAbastecimento');if(btn)btn.disabled=true;toast('Gravando abastecimento na base compartilhada...','info',true,false);
+  try{var result=await window.programFirebase.saveFuelRecord(registro);if(!result||result.written!==true||String(result.fuelId)!==registro.id)throw new Error('O Firebase não confirmou este abastecimento específico.');if(!abastecimentos.some(function(a){return String(a.id)===registro.id;}))abastecimentos.push(registro);salvarDBLocal();toast('Abastecimento confirmado na base compartilhada.','success',true,false);renderAbastecimento();}
+  catch(err){console.error('Falha ao gravar abastecimento:',err);toast('Não recebi a confirmação. Não conte este abastecimento como salvo; confira antes de tentar novamente.','error',true,false);if(btn)btn.disabled=false;}
+  finally{_abastSalvando=false;}
 }
+
 function abastecimentosComIntervalo(lista){
   var ordenados=lista.slice().sort(function(a,b){var da=a.data||'',db=b.data||'';if(da!==db)return da.localeCompare(db);return String(a.criadoEm||'').localeCompare(String(b.criadoEm||''));});
   var anterior={},saida=[];
@@ -2764,12 +2776,12 @@ function canMonitorProfile(profile) {
 function readCollections(profile) {
   if (profile.role === 'Gestor') return allCollections.slice();
   if (profile.role === 'Analista') { const names = ['programacoes','clientes','regioes']; if (canMonitorProfile(profile)) names.push('rastreamento'); return names; }
-  if (profile.role === 'Motorista') return ['programacoes'];
+  if (profile.role === 'Motorista') return profile.canFuel === true ? ['programacoes','abastecimentos'] : ['programacoes'];
   return [];
 }
 function fuelReferenceAllowed(profile) { return profile.role === 'Gestor' || profile.canFuel === true; }
 function requiredCollections(profile) {
-  const names = readCollections(profile);
+  const names = readCollections(profile).filter((name) => name !== 'retornos' && !(profile.role === 'Motorista' && name === 'abastecimentos'));
   if (fuelReferenceAllowed(profile)) names.push('veiculosAbastecimento','motoristasAbastecimento');
   return names;
 }
@@ -2836,6 +2848,7 @@ function receiveCollection(name, snap) {
     trackingBaseline = new Map(currentTracking);
   } else {
     baseline[name] = dataMap(name, arr);
+    if (name === 'abastecimentos' && activeProfile && activeProfile.role === 'Motorista') arr.forEach((item) => { if (item.id) lastSubmittedFuel.add(String(item.id)); });
   }
   initialSeen.add(name);
   const required = activeProfile ? requiredCollections(activeProfile) : [];
@@ -2866,7 +2879,7 @@ function scheduleSync(state) {
           if (w.settled) return;
           w.settled = true;
           if (cancelled) w.reject(new Error('A sincronização foi interrompida.'));
-          else w.resolve({ written: !!(written && written.written), programWrittenIds: written && Array.isArray(written.programWrittenIds) ? written.programWrittenIds : [] });
+          else w.resolve({ written: written === true || !!(written && written.written === true), programWrittenIds: written && Array.isArray(written.programWrittenIds) ? written.programWrittenIds : [] });
         });
         writeWaiters = writeWaiters.filter((w) => !w.settled);
       }, (err) => {
@@ -2983,6 +2996,22 @@ async function syncStateNow(state, epoch) {
   newFuelIds.forEach((id) => lastSubmittedFuel.add(id));
   return true;
 }
+async function saveFuelRecord(record) {
+  if (!activeProfile || !dataReady || activeProfile.role !== 'Motorista' || activeProfile.canFuel !== true) throw new Error('Este perfil não está autorizado a registrar abastecimentos.');
+  if (!record || !record.id || record.registradoPorLogin !== activeProfile.login || record.registradoPor !== activeProfile.nome) throw new Error('O abastecimento não corresponde ao motorista autenticado.');
+  const id = String(record.id);
+  const ref = refPath('abastecimentos', id);
+  const data = itemData('abastecimentos', record);
+  const batch = writeBatch(db);
+  batch.set(ref, data);
+  await batch.commit();
+  lastSubmittedFuel.add(id);
+  remote.abastecimentos = (remote.abastecimentos || []).filter((x) => String(x.id) !== id).concat([data]);
+  baseline.abastecimentos = dataMap('abastecimentos', remote.abastecimentos);
+  publish();
+  return { written: true, fuelId: id };
+}
+
 async function saveProgramStatus(id, patch) {
   const key = String(id || '');
   if (!activeProfile || !dataReady || activeProfile.role !== 'Motorista') throw new Error('Este acesso não pode gravar o status da entrega.');
@@ -3054,8 +3083,11 @@ async function startSync(profile) {
   const epoch = syncEpoch;
   const required = requiredCollections(profile);
   initialPromise = new Promise((resolve, reject) => { initialResolve = resolve; initialReject = reject; });
-  const sub = (name, ref) => {
-    const u = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => receiveCollection(name, snap), (err) => failInitial(err));
+  const sub = (name, ref, optional) => {
+    const u = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => receiveCollection(name, snap), (err) => {
+      if (optional) { console.warn('Recurso opcional indisponível:', name, err); return; }
+      failInitial(err);
+    });
     unsubscribers.push(u);
   };
   const pRef = collection(db, 'programacoes');
@@ -3070,6 +3102,7 @@ async function startSync(profile) {
     sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'));
   }
   if (profile.role === 'Gestor') sub('abastecimentos', collection(db, 'abastecimentos'));
+  else if (profile.role === 'Motorista' && profile.canFuel === true) sub('abastecimentos', query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.login)), true);
   if (canMonitorProfile(profile)) sub('rastreamento', collection(db, 'rastreamento'));
   if (!required.length) throw new Error('Nenhuma coleção autorizada para este perfil.');
   let timeoutId;
@@ -3115,6 +3148,7 @@ window.programFirebase = {
   stopSync,
   syncState: scheduleSync,
   saveProgramStatus,
+  saveFuelRecord,
   migrateLocalState,
   sendPasswordReset: (email) => sendPasswordResetEmail(auth, email.trim().toLowerCase())
 };
