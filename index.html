@@ -1319,8 +1319,8 @@ function playNotifSound(){
 
 /* ============ NOTIFICAÇÕES MOTORISTA ============ */
 function getMinhasEntregas(){if(!user)return [];if(user.role==='Motorista')return programacoes.filter(function(p){return p.motorista===user.nome;});return programacoes.slice();}
-function getEntregasNaoLidas(){if(!user||user.role!=='Motorista')return [];return programacoes.filter(function(p){if(p.motorista!==user.nome)return false;if(!p.lidoPor)p.lidoPor=[];return p.lidoPor.indexOf(user.nome)<0;});}
-function marcarLido(num){for(var i=0;i<programacoes.length;i++){if(programacoes[i].numero===num){if(!programacoes[i].lidoPor)programacoes[i].lidoPor=[];if(programacoes[i].lidoPor.indexOf(user.nome)<0)programacoes[i].lidoPor.push(user.nome);break;}}saveDB();}
+function getEntregasNaoLidas(){if(!user||user.role!=='Motorista')return [];return programacoes.filter(function(p){if(p.motorista!==user.nome||p.status!=='Programado')return false;var lidos=Array.isArray(p.lidoPor)?p.lidoPor:[];return lidos.indexOf(user.nome)<0;});}
+function marcarLido(num){for(var i=0;i<programacoes.length;i++){if(String(programacoes[i].numero)===String(num)){if(!Array.isArray(programacoes[i].lidoPor))programacoes[i].lidoPor=[];if(programacoes[i].lidoPor.indexOf(user.nome)<0)programacoes[i].lidoPor.push(user.nome);break;}}saveDB();}
 function atualizarSino(){
   var wrap=document.getElementById('sinoWrap');if(!wrap)return;
   if(!user||user.role!=='Motorista'){wrap.innerHTML='';return;}
@@ -1328,29 +1328,21 @@ function atualizarSino(){
   wrap.innerHTML='<button class="sino-btn'+(temNova?' shake':'')+'" onclick="abrirNotif()" title="Notificações">'+ICO.bell+(temNova?'<span class="sino-dot"></span>':'')+'</button>';
 }
 function abrirNotif(){
-  var naoLidas=getEntregasNaoLidas();
-  var todas=getMinhasEntregas().slice().sort(function(a,b){return (b.dataEntrega||'').localeCompare(a.dataEntrega||'');});
+  var naoLidas=getEntregasNaoLidas().slice().sort(function(a,b){return (a.dataEntrega||'').localeCompare(b.dataEntrega||'')||(a.horaEntrega||'').localeCompare(b.horaEntrega||'');});
   var body=document.getElementById('modalNotifBody');var html='';
-  if(naoLidas.length>0){
-    html+='<div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px">Novas ('+naoLidas.length+')</div>';
+  if(naoLidas.length===0)html='<div class="empty">Nenhuma nova entrega programada.</div>';
+  else{
+    html+='<div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px">Novas entregas programadas ('+naoLidas.length+')</div>';
     for(var i=0;i<naoLidas.length;i++){var p=naoLidas[i];
-      html+='<div style="background:linear-gradient(135deg,#fff5f5,#ffe9e9);border:1px solid #f3c9c6;border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="fecharModalNotif();marcarLidoEIr(\''+esc(p.numero)+'\')">'
+      html+='<button type="button" style="width:100%;text-align:left;background:linear-gradient(135deg,#fff5f5,#ffe9e9);border:1px solid #f3c9c6;border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="marcarMensagemEntregaLida(\''+esc(p.numero)+'\')">'
         +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><b style="font-size:14px;color:var(--r-azul-4)">'+esc(p.cad)+'</b> · '+esc(p.horaEntrega||'')+'</div><span class="pill programado" style="font-size:10px">NOVA</span></div>'
         +'<div style="font-size:12px;color:var(--muted);margin-top:4px">'+fmtDataBR(p.dataEntrega)+' · '+esc(p.carro||'-')+'</div>'
-        +'<div style="font-size:12px;color:var(--muted);margin-top:2px">'+esc(p.endereco||'-')+'</div>'
-        +'</div>';}
-    html+='<div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;margin:12px 0 8px">Todas</div>';
+        +'</button>';}
   }
-  if(todas.length===0){html+='<div class="empty">Sem entregas</div>';}
-  else{for(var j=0;j<todas.length;j++){var q=todas[j];
-    html+='<div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer" onclick="fecharModalNotif();marcarLidoEIr(\''+esc(q.numero)+'\')">'
-      +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="color:var(--r-azul-4)">'+esc(q.cad)+'</b>'+statusProgPill(q.status)+'</div>'
-      +'<div style="font-size:12px;color:var(--muted);margin-top:3px">'+fmtDataBR(q.dataEntrega)+' · '+esc(q.horaEntrega||'')+'</div>'
-      +'</div>';}}
   body.innerHTML=html;document.getElementById('modalNotif').classList.add('active');
 }
 function fecharModalNotif(){document.getElementById('modalNotif').classList.remove('active');}
-function marcarLidoEIr(num){marcarLido(num);atualizarSino();navSub('motorista');setTimeout(function(){abrirModalMot(num);},150);}
+function marcarMensagemEntregaLida(num){marcarLido(num);atualizarSino();abrirNotif();}
 function checarNovasEntregas(){
   if(!user||user.role!=='Motorista')return;
   var naoLidas=getEntregasNaoLidas();var sig=naoLidas.map(function(x){return x.numero;}).join(',');
