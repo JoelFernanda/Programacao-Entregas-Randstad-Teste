@@ -3105,7 +3105,7 @@ async function startSync(profile) {
     sub('motoristasAbastecimento', collection(db, 'motoristasAbastecimento'), optionalFuelRefs);
   }
   if (profile.role === 'Gestor') sub('abastecimentos', collection(db, 'abastecimentos'));
-  else if (profile.role === 'Motorista' && profile.canFuel === true) sub('abastecimentos', query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.login)), true);
+  else if (profile.role === 'Motorista' && profile.canFuel === true) sub('abastecimentos', query(collection(db, 'abastecimentos'), where('registradoPorLogin', '==', profile.user)), true);
   if (canMonitorProfile(profile)) sub('rastreamento', collection(db, 'rastreamento'));
   if (!required.length) throw new Error('Nenhuma coleção autorizada para este perfil.');
   let timeoutId;
