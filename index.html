@@ -1648,13 +1648,13 @@ function renderProgramacao(){
 function onMudarCadProg(){
   var cad=document.getElementById('progCad').value;
   var cli=encontrarClientePorCad(cad);
-  if(cli){
-    document.getElementById('progCliente').value=nomeClienteDoCad(cli);
-    if(cli.endereco && !document.getElementById('progEndereco').value){document.getElementById('progEndereco').value=cli.endereco;}
-    if(cli.regiao && !document.getElementById('progRegiao').value){document.getElementById('progRegiao').value=cli.regiao;}
-  } else {
-    document.getElementById('progCliente').value='';
-  }
+  var campoCliente=document.getElementById('progCliente');
+  var campoEndereco=document.getElementById('progEndereco');
+  var campoRegiao=document.getElementById('progRegiao');
+  if(campoCliente)campoCliente.value=cli?nomeClienteDoCad(cli):'';
+  // Ao trocar o CAD, substitui endereço e região em conjunto; nunca reutiliza os do CAD anterior.
+  if(campoEndereco)campoEndereco.value=cli?String(cli.endereco||'').trim():'';
+  if(campoRegiao)campoRegiao.value=cli?String(cli.regiao||'').trim():'';
 }
 function onMudarMotorista(){var mot=document.getElementById('progMotorista').value;var carro=null;for(var i=0;i<CARROS.length;i++){if(CARROS[i].motorista===mot&&CARROS[i].motorista){carro=CARROS[i];break;}}var campoCarro=document.getElementById('progCarro');if(mot==='Outro'){campoCarro.value='';return;}if(carro)campoCarro.value=carro.nome;}
 function salvarProg(){
