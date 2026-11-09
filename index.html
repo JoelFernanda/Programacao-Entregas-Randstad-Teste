@@ -2963,6 +2963,7 @@ function scheduleSync(state) {
       if (epoch !== syncEpoch) throw new Error('A sincronização foi interrompida.');
       const batch = writeBatch(db);
       if (op.type === 'delete') batch.delete(op.ref);
+      else if (op.type === 'update' && op.ref && op.ref.parent && op.ref.parent.id === 'programacoes') batch.update(op.ref, op.data);
       else if (op.ref && op.ref.parent && op.ref.parent.id === 'programacoes') {
         const patch = {};
         driverFields.forEach((field) => {
@@ -3021,7 +3022,19 @@ async function syncStateNow(state, epoch) {
       if (!old.has(id)) {
         if (activeProfile.role !== 'Motorista') ops.push({ type: 'set', ref: refPath(name, id), data });
       } else if (!equal(data, old.get(id))) {
-        if (name !== 'programacoes' || activeProfile.role !== 'Motorista' || changedKeys(old.get(id), data).every((k) => driverFields.includes(k))) {
+        if (name === 'programacoes' && activeProfile.role === 'Motorista') {
+          // Status and timestamps are written only by saveProgramStatus, which verifies
+          // the Firestore transaction. Never let a delayed full-state snapshot roll them back.
+          const changed = changedKeys(old.get(id), data);
+          // The legacy full-state sync may only update the driver's read marker.
+          // Status, timestamps and recipient are protected and only saveProgramStatus may write them.
+          const safeDriverFields = new Set(['lidoPor']);
+          if (changed.length && changed.every((field) => safeDriverFields.has(field))) {
+            const patch = {};
+            changed.forEach((field) => { if (Object.prototype.hasOwnProperty.call(data, field)) patch[field] = data[field]; });
+            if (Object.keys(patch).length) ops.push({ type: 'update', ref: refPath(name, id), data: patch });
+          }
+        } else {
           ops.push({ type: 'set', ref: refPath(name, id), data });
         }
       }
