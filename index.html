@@ -1201,8 +1201,9 @@ var DB_KEY='randstad_programacao_v1';
 var legadoLocalPendente=null;
 var sincronizacaoFirebaseAtiva=false;
 function estadoAtualDB(){return {programacoes:programacoes,clientes:clientes,regioes:regioes,abastecimentos:abastecimentos,veiculosAbastecimento:veiculosAbastecimento,motoristasAbastecimento:motoristasAbastecimento};}
+function estadoLocalSemFotos(){var s=estadoAtualDB();s.programacoes=(s.programacoes||[]).map(function(p){var x=Object.assign({},p);delete x.fotos;return x;});return s;}
 function chaveDBLocal(){return DB_KEY+(user&&user.uid?'_user_'+user.uid:'');}
-function salvarDBLocal(){try{localStorage.setItem(chaveDBLocal(),JSON.stringify(estadoAtualDB()));return true;}catch(e){return false;}}
+function salvarDBLocal(){try{localStorage.setItem(chaveDBLocal(),JSON.stringify(estadoLocalSemFotos()));return true;}catch(e){return false;}}
 function concluirGravacaoFirebase(seq,resultado){
   if(seq!==_firebaseSaveSequence)return;
   _firebaseRetryState=false;if(!Object.keys(_programStatusSaveBusy||{}).length)atualizarIndicadorSincronizacao('synced');
@@ -1278,8 +1279,25 @@ function loadDB(chave){try{var raw=localStorage.getItem(chave||DB_KEY);if(raw){v
 function capturarDadosLegados(){try{var raw=localStorage.getItem(DB_KEY);if(!raw)return null;var d=JSON.parse(raw);return {programacoes:d.programacoes||[],clientes:d.clientes||[],regioes:d.regioes||[],abastecimentos:d.abastecimentos||[],veiculosAbastecimento:d.veiculosAbastecimento||[],motoristasAbastecimento:d.motoristasAbastecimento||[]};}catch(e){return null;}}
 var firebaseSnapshotRenderPendente=false;
 var fotosLocaisFirebase={};
+var dbFotosLocalPromise=null;
+function abrirDBFotosLocal(){
+  if(!window.indexedDB)return Promise.reject(new Error('Este navegador não disponibiliza armazenamento local de fotos.'));
+  if(dbFotosLocalPromise)return dbFotosLocalPromise;
+  dbFotosLocalPromise=new Promise(function(resolve,reject){var req=indexedDB.open('randstad_fotos_motorista_v1',1);req.onupgradeneeded=function(){var db=req.result;if(!db.objectStoreNames.contains('fotos'))db.createObjectStore('fotos',{keyPath:'id'});};req.onsuccess=function(){resolve(req.result);};req.onerror=function(){dbFotosLocalPromise=null;reject(req.error||new Error('Falha ao abrir armazenamento local de fotos.'));};req.onblocked=function(){dbFotosLocalPromise=null;reject(new Error('O armazenamento local de fotos está ocupado por outra aba.'));};});
+  return dbFotosLocalPromise;
+}
+function idFotoLocal(uid,num){return String(uid||'')+'::'+String(num||'');}
 function carregarFotosLocaisUsuario(uid){
-  fotosLocaisFirebase={};try{var raw=localStorage.getItem(DB_KEY+'_user_'+uid);if(!raw)return;var d=JSON.parse(raw);(d.programacoes||[]).forEach(function(p){if(p&&p.numero&&Array.isArray(p.fotos))fotosLocaisFirebase[String(p.numero)]=p.fotos;});}catch(e){}
+  fotosLocaisFirebase={};var legado={};
+  try{var raw=localStorage.getItem(DB_KEY+'_user_'+uid);if(raw){var d=JSON.parse(raw);(d.programacoes||[]).forEach(function(p){if(p&&p.numero&&Array.isArray(p.fotos))legado[String(p.numero)]=p.fotos;});}}catch(e){}
+  return abrirDBFotosLocal().then(function(db){return new Promise(function(resolve,reject){var tx=db.transaction('fotos','readwrite'),store=tx.objectStore('fotos'),req=store.getAll(),encontradas={};req.onsuccess=function(){(req.result||[]).forEach(function(r){if(r.uid===String(uid)&&r.numero&&Array.isArray(r.fotos))encontradas[String(r.numero)]=r.fotos;});Object.keys(legado).forEach(function(num){if(!encontradas[num]){encontradas[num]=legado[num];store.put({id:idFotoLocal(uid,num),uid:String(uid),numero:num,fotos:legado[num]});}});};tx.oncomplete=function(){fotosLocaisFirebase=encontradas;resolve();};tx.onerror=function(){reject(tx.error||new Error('Falha ao carregar fotos locais.'));};tx.onabort=function(){reject(tx.error||new Error('Falha ao carregar fotos locais.'));};});}).catch(function(err){console.warn('Fotos locais indisponíveis:',err);fotosLocaisFirebase=legado;});
+}
+function salvarFotoLocalIndexedDB(uid,num,idx,data){
+  return abrirDBFotosLocal().then(function(db){return new Promise(function(resolve,reject){var tx=db.transaction('fotos','readwrite'),store=tx.objectStore('fotos'),id=idFotoLocal(uid,num),req=store.get(id),fotos;
+    req.onsuccess=function(){var r=req.result;fotos=r&&Array.isArray(r.fotos)?r.fotos.slice():(Array.isArray(fotosLocaisFirebase[String(num)])?fotosLocaisFirebase[String(num)].slice():[]);fotos[idx]=data;store.put({id:id,uid:String(uid),numero:String(num),fotos:fotos});};
+    tx.oncomplete=function(){var r=fotosLocaisFirebase[String(num)]||[];r=r.slice();r[idx]=data;fotosLocaisFirebase[String(num)]=r;resolve(r);};
+    tx.onerror=function(){reject(tx.error||new Error('Falha ao gravar a foto neste aparelho.'));};tx.onabort=function(){reject(tx.error||new Error('Falha ao gravar a foto neste aparelho.'));};
+  });});
 }
 function temCamposNaoSalvos(){
   var nodes=document.querySelectorAll('#conteudo input,#conteudo textarea,#conteudo select');
@@ -1290,18 +1308,27 @@ function temCamposNaoSalvos(){
   }
   return false;
 }
+function capturarRascunhoTela(){
+  var saida={campos:[],foco:null,scrollWindowY:window.scrollY||window.pageYOffset||0,scrollConteudo:0};
+  var content=document.getElementById('conteudo');if(content)saida.scrollConteudo=content.scrollTop||0;
+  var nodes=document.querySelectorAll('#conteudo input[id],#conteudo textarea[id],#conteudo select[id],.modal.active input[id],.modal.active textarea[id],.modal.active select[id]');
+  for(var i=0;i<nodes.length;i++){var el=nodes[i];if(el.type==='file')continue;var c={id:el.id,value:el.value,checked:el.checked,tag:el.tagName};if(el===document.activeElement)saida.foco=el.id;try{if(typeof el.selectionStart==='number'){c.start=el.selectionStart;c.end=el.selectionEnd;}}catch(e){}saida.campos.push(c);}
+  return saida;
+}
+function restaurarRascunhoTela(estado){
+  if(!estado)return;estado.campos.forEach(function(c){var el=document.getElementById(c.id);if(!el)return;if(el.type==='checkbox'||el.type==='radio')el.checked=c.checked;else el.value=c.value;try{if(typeof c.start==='number'&&el.setSelectionRange)el.setSelectionRange(c.start,c.end);}catch(e){}});
+  var content=document.getElementById('conteudo');if(content)content.scrollTop=estado.scrollConteudo||0;if(estado.foco){var f=document.getElementById(estado.foco);if(f)try{f.focus({preventScroll:true});}catch(e){f.focus();}}try{window.scrollTo(0,estado.scrollWindowY||0);}catch(e){}
+}
 function receberEstadoFirebase(s){
   if(sincronizacaoFirebaseAtiva&&_syncUiState!=='syncing'&&_syncUiState!=='saving')atualizarIndicadorSincronizacao('synced');
-  var preservarTela=temCamposNaoSalvos()||!!document.querySelector('.modal.active');
-  var fotosLocais=Object.assign({},fotosLocaisFirebase);programacoes.forEach(function(p){if(p&&p.numero&&p.fotos)fotosLocais[p.numero]=p.fotos;});
-  programacoes=(s.programacoes||[]).map(function(p){var x=Object.assign({},p);if(fotosLocais[x.numero])x.fotos=fotosLocais[x.numero];return x;});
+  var rascunho=capturarRascunhoTela();
+  var fotosLocais=Object.assign({},fotosLocaisFirebase);programacoes.forEach(function(p){if(p&&p.numero&&p.fotos&&!fotosLocais[p.numero])fotosLocais[p.numero]=p.fotos;});
+  programacoes=(s.programacoes||[]).map(function(p){var x=Object.assign({},p);if(fotosLocais[String(x.numero)])x.fotos=fotosLocais[String(x.numero)];return x;});
   clientes=s.clientes||[];regioes=s.regioes&&s.regioes.length?s.regioes:REGIOES_DEFAULT.slice();
   abastecimentos=s.abastecimentos||[];veiculosAbastecimento=s.veiculosAbastecimento||[];
   motoristasAbastecimento=s.motoristasAbastecimento&&s.motoristasAbastecimento.length?s.motoristasAbastecimento:['Joel','Robson','Alexandre','Roger','Fabio'];
   salvarDBLocal();
-  if(user&&abaAtual==='abastecimento'&&user.role!=='Gestor'){var box=document.getElementById('abastHistoricoMotorista');if(box)box.innerHTML=montarHistoricoAbastecimentoMotorista();}
-  if(user&&abaAtual==='abastecimento'&&user.role!=='Gestor'){var historico=document.getElementById('abastHistoricoMotorista');if(historico)historico.innerHTML=montarHistoricoAbastecimentoMotorista();}
-  if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;if(preservarTela){firebaseSnapshotRenderPendente=true;}else{firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);}checarNovasEntregas();}
+  if(user&&abaAtual){var det=document.getElementById('modalProgDet'),mot=document.getElementById('modalMot');var detOn=det&&det.classList.contains('active'),motOn=mot&&mot.classList.contains('active'),numDet=progDetAberta,numMot=motProgAtual;firebaseSnapshotRenderPendente=false;if(abaAtual==='monitoramento')atualizarMapaMonitoramento(false);else navSub(abaAtual);if(detOn&&numDet)verProgDet(numDet);if(motOn&&numMot)abrirModalMot(numMot);restaurarRascunhoTela(rascunho);checarNovasEntregas();}
 }
 window.receiveProgramFirebaseSnapshot=receberEstadoFirebase;
 window.onProgramFirebaseError=function(e){console.error('Falha ao sincronizar Programação:',e);atualizarIndicadorSincronizacao('offline');toast('A conexão com a base compartilhada foi interrompida. Tente novamente.','error',true,true);};
@@ -1423,7 +1450,7 @@ async function iniciarSessaoFirebase(firebaseUser,manterLoginVisivel){
     var perfil=await api.getProfile(firebaseUser);
     var candidato=perfil.role==='Gestor'?(legadoLocalPendente||capturarDadosLegados()):null;
     user={uid:perfil.uid,email:perfil.email,login:perfil.login||perfil.username||perfil.email,user:perfil.login||perfil.username||perfil.email,nome:perfil.nome||perfil.email,role:perfil.role,canFuel:perfil.canFuel===true};
-    carregarFotosLocaisUsuario(perfil.uid);sincronizacaoFirebaseAtiva=false;
+    await carregarFotosLocaisUsuario(perfil.uid);sincronizacaoFirebaseAtiva=false;
     await api.startSync(user);sincronizacaoFirebaseAtiva=true;atualizarIndicadorSincronizacao('synced');
     if(candidato)await oferecerMigracaoLocal(candidato);
     legadoLocalPendente=null;
@@ -2302,7 +2329,7 @@ function motFinalizarModal(num){
   var patch={status:'Entregue',horaFim:atual.horaFim,fimRealISO:atual.fimRealISO,quemRecebeu:quem,duracaoEntregaMinutos:atual.duracaoEntregaMinutos};if(operadorColeta){atual.fimRegistradoPorNome=user.nome;atual.fimRegistradoPorLogin=String(user.user||user.email||'').trim().toLowerCase();patch.fimRegistradoPorNome=atual.fimRegistradoPorNome;patch.fimRegistradoPorLogin=atual.fimRegistradoPorLogin;desejado=capturarCamposStatusEntrega(atual);}
   salvarStatusEntregaConfirmado(id,'finalizar',anterior,desejado,patch,function(){saveDB();fecharModalMot();renderMotorista();atualizarSino();},function(){if(motoristaDesignado&&(encontrarProgPorNumero(id)||{}).status==='Em Rota')iniciarAtualizacoesLocalizacao(id);});
 }
-function motFotoModal(num,idx,input){if(!input.files||!input.files[0])return;var file=input.files[0];if(input)input.value='';toast('Preparando a foto…','info');prepararFotoLocal(file,function(data,erro){if(erro){toast(erro,'error');return;}var p=encontrarProgPorNumero(num);if(!p){toast('Não encontrei esta entrega para salvar a foto.','error');return;}if(!Array.isArray(p.fotos))p.fotos=[];var anterior=p.fotos[idx];p.fotos[idx]=data;if(!saveDB()){if(anterior)p.fotos[idx]=anterior;else delete p.fotos[idx];abrirModalMot(num);renderMotorista();toast('O navegador não conseguiu guardar a foto neste aparelho. Libere espaço e tente novamente.','error');return;}abrirModalMot(num);renderMotorista();toast('Foto guardada neste aparelho. Toque nela para abrir, baixar ou compartilhar.','info');});}
+function motFotoModal(num,idx,input){if(!input.files||!input.files[0])return;var file=input.files[0];if(input)input.value='';toast('Preparando a foto…','info');prepararFotoLocal(file,function(data,erro){if(erro){toast(erro,'error');return;}var p=encontrarProgPorNumero(num);if(!p){toast('Não encontrei esta entrega para salvar a foto.','error');return;}salvarFotoLocalIndexedDB(user&&user.uid,num,idx,data).then(function(fotos){p.fotos=fotos;saveDB();abrirModalMot(num);renderMotorista();toast('Foto guardada neste aparelho. Toque nela para abrir, baixar ou compartilhar.','info');}).catch(function(err){console.error('Falha ao guardar foto local:',err);abrirModalMot(num);renderMotorista();toast('A foto foi preparada, mas não foi guardada neste aparelho. Verifique o espaço disponível ou tente no Chrome.','error');});});}
 function motAbrirWaze(num){var p=encontrarProgPorNumero(num);if(!p)return;if(p.status!=='Em Rota'){toast('Inicie a entrega antes de abrir a navegação','error');return;}window.open('https://waze.com/ul?q='+encodeURIComponent(p.endereco),'_blank');}
 function motWhats(tel,num){var p=encontrarProgPorNumero(num);if(!p)return;var msg='Olá '+p.responsavel+', sou o motorista da Randstad e estou a caminho para entregar '+p.volumes+' volume(s)'+(p.numeroReq?' referente à requisição '+p.numeroReq:'')+'.';window.open('https://wa.me/55'+tel+'?text='+encodeURIComponent(msg),'_blank');}
 
