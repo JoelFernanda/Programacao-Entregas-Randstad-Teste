@@ -1141,7 +1141,7 @@ function agora(){return new Date().toLocaleString('pt-BR');}
 function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function iniciais(n){return (n||'').split(/\s+/).slice(0,2).map(function(x){return x[0]||'';}).join('').toUpperCase();}
 function fmtDataBR(iso){if(!iso)return '';var p=iso.split('-');if(p.length!==3)return iso;return p[2]+'/'+p[1]+'/'+p[0];}
-function gerarNumeroProg(){return 'PROG-'+String(programacoes.length+1).padStart(4,'0');}
+function gerarNumeroProg(){var numero;do{var uuid=window.crypto&&typeof window.crypto.randomUUID==='function'?window.crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);numero='PROG-'+String(uuid).toUpperCase();}while(programacoes.some(function(p){return String(p&&p.numero||'')===numero;}));return numero;}
 function instanteCriacaoProgramacao(p){
   var iso=Date.parse(p&&p.criadoEmISO||'');if(isFinite(iso))return iso;
   var s=String(p&&p.criadoEm||''),m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,?\s*(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
